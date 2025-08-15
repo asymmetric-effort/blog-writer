@@ -1,104 +1,183 @@
-# codex.plan.yaml
-version: 1
+# codex.plan.yaml — blog-writer v1.1 (Go + Wails)
+# Purpose: a machine-readable task DAG for agents to produce an MVP from SPECIFICATION.md
+
+version: 2
 spec_file: SPECIFICATION.md
-goals:
-  - Produce a runnable Electron+React+TS MVP per SPECIFICATION.md
-  - Keep content schema and LaTeX/image rules exact
+
+environment:
+  go: ">=1.24"
+  node: ">=24"
+  npm: ">=10"
+  wails: "v2"
+
+principles:
+  - Offline desktop app (no network calls at runtime)
+  - Content over presentation; JSON IR is the source of truth
+  - Save = write + commit (autosave = write only)
+  - Security first: CSP/local assets only; sanitize SVG aggressively
+  - Tests accompany core modules (schema, serde, sanitizer, git)
+
 constraints:
-  - TypeScript strict mode
-  - No network calls at runtime (offline editor)
-  - Save = write+commit semantics
-style:
-  tsconfig: strict
-  lint: eslint+prettier
+  - TypeScript strict mode in frontend
+  - Go code uses modules and CGO enabled for Wails
+  - Images must be embedded as data:image/svg+xml;base64,...
+  - JSON must validate against the concise tag-based schema
+
+artifacts:
+  - build/bin/**            # platform executables from `wails build`
+  - src/schema/article.schema.json
+  - frontend/dist/**        # React build output
+
+# ------------------------- TASKS -------------------------
+
 tasks:
+  - id: scaffold-wails
+    name: Project scaffold (Go + Wails + React/TS)
+    desc: Initialize Wails app, configure go.mod, wails.json, frontend tooling (Vite, TS, ESLint).
+    outputs:
+      - go.mod
+      - wails.json
+      - main.go
+      - internal/app/app.go
+      - frontend/index.html
+      - frontend/src/main.tsx
+      - frontend/tsconfig.json
+      - package.json
+    acceptance:
+      - `wails doctor` passes for the target platform
+      - `npm run build` succeeds in frontend
+
   - id: schema-types
-    name: Define JSON schema and TS types
-    desc: Author article.schema.json and matching TypeScript types; add AJV validator.
-    outputs: [ "src/schema/article.schema.json", "src/types/article.ts", "src/main/validation.ts" ]
-    accepts: [ "SPECIFICATION.md" ]
-    depends_on: []
+    name: JSON Schema + Types (Go & TS)
+    desc: Author article.schema.json and generate/handwrite matching TS and Go types; wire Go validator.
+    outputs:
+      - src/schema/article.schema.json
+      - frontend/src/types/article.ts
+      - internal/schema/validator.go
+    depends_on: [scaffold-wails]
     acceptance:
-      - AJV validates canonical example
-      - Round-trip serde tests pass
+      - Canonical example validates
+      - Invalid samples fail with readable paths
 
-  - id: main-shell
-    name: Electron main, window, security
-    desc: Create main process with CSP, contextIsolation, single instance.
-    outputs: [ "src/main/main.ts" ]
-    depends_on: [ "schema-types" ]
+  - id: sanitizer
+    name: SVG sanitization & data URI encoding
+    desc: Implement allowlist-based SVG sanitizer and Base64 data URI encoder in Go; include adversarial tests.
+    outputs:
+      - internal/image/sanitize.go
+      - internal/image/encode.go
+      - internal/image/sanitize_test.go
     acceptance:
-      - App launches to Repo Wizard without nodeIntegration
+      - Removes script/foreignObject/external hrefs
+      - Enforces size/node-count limits
 
-  - id: preload-api
-    name: Preload contextBridge API
-    desc: Implement BlogWriterAPI surface.
-    outputs: [ "src/preload/index.ts", "src/preload/api.ts" ]
-    depends_on: [ "schema-types" ]
+  - id: image-pipeline
+    name: Image conversion to SVG (stub + hooks)
+    desc: Provide a raster→SVG conversion stub with CLI hook points; full vectorization can be TODO.
+    outputs:
+      - internal/image/convert.go
+    depends_on: [sanitizer]
     acceptance:
-      - Renderer can call typed APIs; invalid params return typed errors
+      - Non-SVG inputs return clear TODO error
+      - Native SVG inputs sanitize+embed correctly
 
   - id: git-layer
-    name: Git CLI wrapper
-    desc: Stage/commit/push/pull, init-from-SSH, status.
-    outputs: [ "src/main/git.ts" ]
-    depends_on: [ "main-shell" ]
+    name: Git CLI wrapper (Go)
+    desc: Status, stage, commit (with template), amend, pull --rebase, push; init from SSH remote; recent repos.
+    outputs:
+      - internal/git/git.go
+      - internal/git/git_test.go
+    depends_on: [scaffold-wails]
     acceptance:
       - Temp-repo tests verify save=commit flow
 
-  - id: svg-pipeline
-    name: SVG sanitize/encode pipeline
-    desc: Sanitize, minify, base64; raster→SVG stub with TODOs.
-    outputs: [ "src/image/sanitize-svg.ts", "src/image/encode.ts" ]
-    depends_on: []
+  - id: repo-service
+    name: Repo & Article services (Go)
+    desc: RepoService (open/create/recent/settings) and ArticleService (CRUD, ID allocation, validation, autosave).
+    outputs:
+      - internal/services/repo.go
+      - internal/services/article.go
+      - internal/services/models.go
+      - internal/services/errors.go
+    depends_on: [schema-types, git-layer]
     acceptance:
-      - Adversarial SVG unit tests pass; data URI pattern enforced
+      - ID allocation uses epoch seconds with collision backoff
+      - Save(article, commit=true) writes and commits
+
+  - id: bindings
+    name: Wails bindings exposure
+    desc: Bind RepoService, ArticleService, GitService, ImageService; generate TS bindings under frontend/wailsjs.
+    outputs:
+      - internal/app/bindings.go
+      - frontend/wailsjs/**
+    depends_on: [repo-service, image-pipeline]
+    acceptance:
+      - Frontend can call `window.go.*` methods with correct types
+
+  - id: editor-ui
+    name: React editor shell + mapping (IR ⇄ editor state)
+    desc: Implement WYSIWYG with h1–h5, p, span, b/i/u, code, br, ol/ul/li, blockquote, pre, hr, img, math.
+    outputs:
+      - frontend/src/components/Editor.tsx
+      - frontend/src/components/Toolbar.tsx
+      - frontend/src/lib/serde.ts
+      - frontend/src/components/MathBlock.tsx
+    depends_on: [bindings, schema-types]
+    acceptance:
+      - Round-trip JSON fidelity on sample doc (golden test)
 
   - id: repo-wizard
-    name: Startup repo wizard UI
-    outputs: [ "src/renderer/pages/RepoWizard.tsx" ]
-    depends_on: [ "preload-api", "git-layer" ]
+    name: Startup Repo Wizard UI
+    desc: Open existing, open recent, or create-from-SSH; write settings; navigate to editor on success.
+    outputs:
+      - frontend/src/pages/RepoWizard.tsx
+    depends_on: [bindings]
     acceptance:
-      - Open existing / create-from-SSH / open recent works
-
-  - id: editor-core
-    name: React WYSIWYG shell + mapping
-    desc: Map editor state ⇄ tag-based JSON IR (h1–h5, p, span, b/i/u, br, code, lists, blockquote, pre, hr, img, math).
-    outputs: [ "src/renderer/components/Editor.tsx", "src/lib/serde.ts" ]
-    depends_on: [ "schema-types", "preload-api", "svg-pipeline" ]
-    acceptance:
-      - Round-trip fidelity on sample document
-
-  - id: math-preview
-    name: LaTeX inline/display preview
-    outputs: [ "src/renderer/components/MathBlock.tsx", "src/renderer/styles/katex.min.css" ]
-    depends_on: [ "editor-core" ]
-    acceptance:
-      - Inline and display math render; JSON stores TeX only
+      - All three flows function; errors surfaced politely
 
   - id: git-panel
-    name: Git status/commit UI
-    outputs: [ "src/renderer/components/GitPanel.tsx" ]
-    depends_on: [ "git-layer", "repo-wizard" ]
+    name: Git panel UI
+    desc: Status view, commit box (template), push/pull, diff viewer for JSON.
+    outputs:
+      - frontend/src/components/GitPanel.tsx
+    depends_on: [git-layer, bindings]
     acceptance:
-      - Save = write+commit; errors surfaced in UI
+      - Save button writes+commits; autosave writes only
+
+  - id: tests
+    name: Test suite wiring (Vitest + Go test)
+    desc: Configure CI tests; add golden sample; property tests for serde where feasible.
+    outputs:
+      - frontend/vitest.config.ts
+      - tests/golden.sample.json
+      - internal/schema/validator_test.go
+    depends_on: [schema-types, editor-ui]
+    acceptance:
+      - CI runs Go tests and Vitest with all passing
 
   - id: ci-packaging
-    name: CI and packaging
-    outputs: [ ".github/workflows/release.yml", "package.json" ]
-    depends_on: [ "main-shell", "preload-api", "editor-core" ]
+    name: GitHub Actions (Go 1.24+ / Node 24+) + Wails build
+    desc: Matrix builds for Windows/Linux/macOS (x64/arm64) using Go 1.24+ and Node 24+; upload artifacts; optional release.
+    outputs:
+      - .github/workflows/ci.yml
+      - .github/workflows/release.yml
+    depends_on: [scaffold-wails, bindings]
     acceptance:
-      - Matrix build artifacts for Win/Linux/macOS x64/arm64
+      - Artifacts uploaded for each OS/arch
 
 parallelization:
-  # Tasks with no mutual deps can run together
   groups:
-    - [ "schema-types", "svg-pipeline" ]
-    - [ "main-shell" ]
-    - [ "preload-api", "git-layer" ]
-    - [ "repo-wizard", "editor-core" ]
-    - [ "math-preview", "git-panel" ]
-    - [ "ci-packaging" ]
+    - [scaffold-wails]
+    - [schema-types, sanitizer]
+    - [git-layer, image-pipeline]
+    - [repo-service]
+    - [bindings]
+    - [editor-ui, repo-wizard]
+    - [git-panel, tests]
+    - [ci-packaging]
+
 definition_of_done:
-  - All acceptance checks green
-  - MVP launches, creates repo, edits/saves/commits article with math + embedded SVG
+  - App launches and passes repo wizard
+  - Create/edit article; inline+display math preview; image sanitized/embedded (SVG)
+  - Autosave writes without commit; Save commits with template
+  - JSON validates against schema; round-trip fidelity on golden sample
+  - CI produces release artifacts for Win/Linux/macOS on x64/arm64
