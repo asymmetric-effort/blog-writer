@@ -5,8 +5,8 @@ Blog Writer is an offline desktop editor for authoring blog posts as structured 
 
 ## Prerequisites
 
-- Node.js 20
-- npm 10
+- Node.js 24.2.0
+- npm 11.4.2
 
 ## Development
 
