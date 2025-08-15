@@ -1,0 +1,104 @@
+# codex.plan.yaml
+version: 1
+spec_file: SPECIFICATION.md
+goals:
+  - Produce a runnable Electron+React+TS MVP per SPECIFICATION.md
+  - Keep content schema and LaTeX/image rules exact
+constraints:
+  - TypeScript strict mode
+  - No network calls at runtime (offline editor)
+  - Save = write+commit semantics
+style:
+  tsconfig: strict
+  lint: eslint+prettier
+tasks:
+  - id: schema-types
+    name: Define JSON schema and TS types
+    desc: Author article.schema.json and matching TypeScript types; add AJV validator.
+    outputs: [ "src/schema/article.schema.json", "src/types/article.ts", "src/main/validation.ts" ]
+    accepts: [ "SPECIFICATION.md" ]
+    depends_on: []
+    acceptance:
+      - AJV validates canonical example
+      - Round-trip serde tests pass
+
+  - id: main-shell
+    name: Electron main, window, security
+    desc: Create main process with CSP, contextIsolation, single instance.
+    outputs: [ "src/main/main.ts" ]
+    depends_on: [ "schema-types" ]
+    acceptance:
+      - App launches to Repo Wizard without nodeIntegration
+
+  - id: preload-api
+    name: Preload contextBridge API
+    desc: Implement BlogWriterAPI surface.
+    outputs: [ "src/preload/index.ts", "src/preload/api.ts" ]
+    depends_on: [ "schema-types" ]
+    acceptance:
+      - Renderer can call typed APIs; invalid params return typed errors
+
+  - id: git-layer
+    name: Git CLI wrapper
+    desc: Stage/commit/push/pull, init-from-SSH, status.
+    outputs: [ "src/main/git.ts" ]
+    depends_on: [ "main-shell" ]
+    acceptance:
+      - Temp-repo tests verify save=commit flow
+
+  - id: svg-pipeline
+    name: SVG sanitize/encode pipeline
+    desc: Sanitize, minify, base64; raster→SVG stub with TODOs.
+    outputs: [ "src/image/sanitize-svg.ts", "src/image/encode.ts" ]
+    depends_on: []
+    acceptance:
+      - Adversarial SVG unit tests pass; data URI pattern enforced
+
+  - id: repo-wizard
+    name: Startup repo wizard UI
+    outputs: [ "src/renderer/pages/RepoWizard.tsx" ]
+    depends_on: [ "preload-api", "git-layer" ]
+    acceptance:
+      - Open existing / create-from-SSH / open recent works
+
+  - id: editor-core
+    name: React WYSIWYG shell + mapping
+    desc: Map editor state ⇄ tag-based JSON IR (h1–h5, p, span, b/i/u, br, code, lists, blockquote, pre, hr, img, math).
+    outputs: [ "src/renderer/components/Editor.tsx", "src/lib/serde.ts" ]
+    depends_on: [ "schema-types", "preload-api", "svg-pipeline" ]
+    acceptance:
+      - Round-trip fidelity on sample document
+
+  - id: math-preview
+    name: LaTeX inline/display preview
+    outputs: [ "src/renderer/components/MathBlock.tsx", "src/renderer/styles/katex.min.css" ]
+    depends_on: [ "editor-core" ]
+    acceptance:
+      - Inline and display math render; JSON stores TeX only
+
+  - id: git-panel
+    name: Git status/commit UI
+    outputs: [ "src/renderer/components/GitPanel.tsx" ]
+    depends_on: [ "git-layer", "repo-wizard" ]
+    acceptance:
+      - Save = write+commit; errors surfaced in UI
+
+  - id: ci-packaging
+    name: CI and packaging
+    outputs: [ ".github/workflows/release.yml", "package.json" ]
+    depends_on: [ "main-shell", "preload-api", "editor-core" ]
+    acceptance:
+      - Matrix build artifacts for Win/Linux/macOS x64/arm64
+
+parallelization:
+  # Tasks with no mutual deps can run together
+  groups:
+    - [ "schema-types", "svg-pipeline" ]
+    - [ "main-shell" ]
+    - [ "preload-api", "git-layer" ]
+    - [ "repo-wizard", "editor-core" ]
+    - [ "math-preview", "git-panel" ]
+    - [ "ci-packaging" ]
+definition_of_done:
+  - All acceptance checks green
+  - MVP launches, creates repo, edits/saves/commits article with math + embedded SVG
