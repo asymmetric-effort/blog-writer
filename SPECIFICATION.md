@@ -667,6 +667,7 @@ interface Article {
 * **Property tests:** randomized node trees; invariants (idempotent serialize/deserialize).
 * **Security tests:** adversarial SVG payloads; size/node limits.
 * **Git tests:** temp repos; wizard flows; conflict handling; save/commit semantics.
+* **Selenium:*** create selenium tests to confirm user experience and feature functionality.
 
 ---
 
