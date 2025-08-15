@@ -1,0 +1,48 @@
+# Copyright 2024 Blog Writer
+name: build-release
+on:
+  push:
+    tags: [ 'v*' ]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macos-14, windows-latest ]
+        arch: [ x64, arm64 ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build:renderer
+      - name: Build app
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ runner.os }}" = "macOS" ]; then
+            npx electron-builder --mac dmg -a ${{ matrix.arch }}
+          elif [ "${{ runner.os }}" = "Windows" ]; then
+            npx electron-builder --win nsis -a ${{ matrix.arch }}
+          else
+            npx electron-builder --linux AppImage -a ${{ matrix.arch }}
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: blog-writer-${{ runner.os }}-${{ matrix.arch }}
+          path: dist/**
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**

@@ -1,22 +1,37 @@
-# blog-writer
+<!-- Copyright 2024 Blog Writer -->
+# Blog Writer
 
-Free‑standing Electron + React + TypeScript desktop app for authoring blog posts as JSON in Git.
+Blog Writer is an offline desktop editor for authoring blog posts as structured JSON files stored in Git repositories. It is built with Electron, React, and TypeScript.
 
-## Quickstart
+## Prerequisites
 
-> Requires Node.js **20.x** and npm **10.x** (see `.nvmrc`).
+- Node.js 20
+- npm 10
+
+## Development
 
 ```bash
-# install deps
 npm ci
-
-# start in development (Electron + renderer dev server)
 npm run dev
+```
 
-# typecheck / lint / test
-npm run typecheck
-npm run lint
+## Testing
+
+```bash
 npm test
+```
 
-# build production app (electron-builder)
+## Linting
+
+```bash
+npm run lint
+```
+
+## Building
+
+```bash
+npm run build:renderer
 npm run build
+```
+
+The application reads and writes articles under a `blog/` folder inside a Git repository. Saving commits changes using the Git CLI.
