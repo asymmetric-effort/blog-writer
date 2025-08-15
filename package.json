@@ -4,7 +4,7 @@
   "main": "dist/main/index.js",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host 0.0.0.0",
     "build:renderer": "vite build",
     "build": "electron-builder",
     "test": "vitest run --coverage",
