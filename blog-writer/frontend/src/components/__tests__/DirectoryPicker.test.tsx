@@ -48,6 +48,15 @@ describe('DirectoryPicker', () => {
     await waitFor(() => expect(DirSvc.Create).toHaveBeenCalledWith('/tmp', 'foo'));
   });
 
+  it('closes modal on escape key', async () => {
+    (DirSvc.List as any).mockResolvedValue([]);
+    const onChange = vi.fn();
+    const { getByRole, queryByRole } = render(<DirectoryPicker onChange={onChange} />);
+    fireEvent.click(getByRole('button', { name: /browse/i }));
+    await waitFor(() => expect(DirSvc.List).toHaveBeenCalled());
+    fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' });
+    await waitFor(() => expect(queryByRole('dialog')).not.toBeInTheDocument());
+
   it('has 5px radius and bevelled outset border', () => {
     const onChange = vi.fn();
     const { getByRole } = render(<DirectoryPicker onChange={onChange} />);
@@ -60,6 +69,7 @@ describe('DirectoryPicker', () => {
     fireEvent.click(getByRole('button', { name: /browse/i }));
     const container = await waitFor(() => getByTestId('tree-container'));
     expect(container).toHaveStyle({ maxHeight: '500px', overflowY: 'auto' });
+
   });
 });
 

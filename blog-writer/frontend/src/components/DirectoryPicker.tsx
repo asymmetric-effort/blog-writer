@@ -1,7 +1,7 @@
 // Copyright (c) 2025 blog-writer authors
 // SPDX-License-Identifier: MIT
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Create, List } from '../../wailsjs/go/services/DirectoryService';
 import DirectoryTree, { DirNode } from './DirectoryTree';
 
@@ -16,6 +16,13 @@ function DirectoryModal({ onSelect, onClose }: { onSelect: (p: string) => void; 
   const [path, setPath] = useState('');
   const [tree, setTree] = useState<DirNode[]>([]);
   const [newName, setNewName] = useState('');
+
+  /** Handles closing the modal when the escape key is pressed. */
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      onClose();
+    }
+  }, [onClose]);
 
   const parentDir = (p: string): string => {
     const parts = p.split(/[/\\]/);
@@ -58,6 +65,24 @@ function DirectoryModal({ onSelect, onClose }: { onSelect: (p: string) => void; 
     loadTree();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleKeyDown]);
+
+  const navigate = (d: string) => {
+    load(d);
+  };
+
+  const goUp = () => {
+    if (path) {
+      const parent = parentDir(path);
+      load(parent);
+    }
+  };
 
   const handleCreate = async () => {
     if (!newName) return;
