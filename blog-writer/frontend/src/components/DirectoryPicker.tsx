@@ -3,6 +3,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { Create, List } from '../../wailsjs/go/services/DirectoryService';
+import useColorScheme from '../hooks/useColorScheme';
 import DirectoryTree, { DirNode } from './DirectoryTree';
 
 /** Props for DirectoryPicker component. */
@@ -16,6 +17,8 @@ function DirectoryModal({ onSelect, onClose }: { onSelect: (p: string) => void; 
   const [path, setPath] = useState('');
   const [tree, setTree] = useState<DirNode[]>([]);
   const [newName, setNewName] = useState('');
+  const scheme = useColorScheme();
+  const dark = scheme === 'dark';
 
   /** Handles closing the modal when the escape key is pressed. */
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -96,8 +99,14 @@ function DirectoryModal({ onSelect, onClose }: { onSelect: (p: string) => void; 
   };
 
   return (
-    <div role="dialog" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.3)' }}>
-      <div style={{ background: 'white', padding: '1rem', maxWidth: '400px', margin: '10% auto' }}>
+    <div
+      role="dialog"
+      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: dark ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.3)' }}
+    >
+      <div
+        data-testid="modal"
+        style={{ background: dark ? '#333' : 'white', color: dark ? 'white' : 'black', padding: '1rem', maxWidth: '400px', margin: '10% auto' }}
+      >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span data-testid="current-path">{path}</span>
         </div>
