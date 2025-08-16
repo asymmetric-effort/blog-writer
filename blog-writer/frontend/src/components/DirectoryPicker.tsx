@@ -100,9 +100,15 @@ function DirectoryModal({ onSelect, onClose }: { onSelect: (p: string) => void; 
 /** DirectoryPicker renders a button that opens DirectoryModal. */
 export default function DirectoryPicker({ onChange, ...rest }: DirectoryPickerProps): JSX.Element {
   const [open, setOpen] = useState(false);
+  const { style, ...buttonProps } = rest;
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} {...rest}>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        style={{ ...pickerButtonStyle, ...(style as React.CSSProperties) }}
+        {...buttonProps}
+      >
         Browse…
       </button>
       {open && (
@@ -117,4 +123,15 @@ export default function DirectoryPicker({ onChange, ...rest }: DirectoryPickerPr
     </>
   );
 }
+
+/**
+ * pickerButtonStyle defines the visual appearance of the DirectoryPicker button,
+ * ensuring a 5px border radius and a bevelled outset border to match user
+ * expectations.
+ */
+const pickerButtonStyle: React.CSSProperties = {
+  borderRadius: '5px',
+  borderStyle: 'outset',
+  borderWidth: '2px'
+};
 
