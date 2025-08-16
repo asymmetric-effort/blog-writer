@@ -1,37 +1,18 @@
 <!-- Copyright 2024 Blog Writer -->
-# Blog Writer
+![Blog Writer](docs/blog-writer.png)
 
 Blog Writer is an offline desktop editor for authoring blog posts as structured JSON files stored in Git repositories. It is built with Electron, React, and TypeScript.
 
-## Prerequisites
+## Documentation
 
-- Node.js 24.2.0
-- npm 11.4.2
+- [Documentation Overview](docs/README.md)
+- [Build and Test Guide](docs/build-and-test.md)
+- [Developer Guide](docs/developer-guide.md)
+- [User Guide](docs/user-guide.md)
 
-## Development
+---
 
-```bash
-npm ci
-npm run dev
-```
+© 2024 Blog Writer
 
-## Testing
+![Asymmetric Effort logo](docs/asymmetric-effort.png)
 
-```bash
-npm test
-```
-
-## Linting
-
-```bash
-npm run lint
-```
-
-## Building
-
-```bash
-npm run build:renderer
-npm run build
-```
-
-The application reads and writes articles under a `blog/` folder inside a Git repository. Saving commits changes using the Git CLI.
