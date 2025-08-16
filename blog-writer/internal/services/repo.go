@@ -2,18 +2,26 @@
 package services
 
 import (
-	"encoding/json"
-	"errors"
-	"os"
-	"os/exec"
-	"path/filepath"
-	"sync"
+        "encoding/json"
+        "errors"
+        "os"
+        "os/exec"
+        "path/filepath"
+        "sort"
+        "sync"
+        "time"
 )
 
 // RepoService manages blog repositories and recent list.
 type RepoService struct {
-	mu         sync.Mutex
-	recentPath string
+        mu         sync.Mutex
+        recentPath string
+}
+
+// RecentRepo describes a repository path and its last-opened timestamp.
+type RecentRepo struct {
+        Path       string    `json:"path"`
+        LastOpened time.Time `json:"lastOpened"`
 }
 
 // NewRepoService creates a RepoService using the user's home directory for config.
@@ -37,54 +45,57 @@ func NewRepoServiceWithDir(dir string) *RepoService {
 }
 
 // Recent returns up to five most recently opened repositories.
-func (r *RepoService) Recent() ([]string, error) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	data, err := os.ReadFile(r.recentPath)
-	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			return []string{}, nil
-		}
-		return nil, err
-	}
-	var rec struct {
-		Paths []string `json:"paths"`
-	}
-	if err := json.Unmarshal(data, &rec); err != nil {
-		return nil, err
-	}
-	if len(rec.Paths) > 5 {
-		rec.Paths = rec.Paths[:5]
-	}
-	return rec.Paths, nil
+func (r *RepoService) Recent() ([]RecentRepo, error) {
+        r.mu.Lock()
+        defer r.mu.Unlock()
+        data, err := os.ReadFile(r.recentPath)
+        if err != nil {
+                if errors.Is(err, os.ErrNotExist) {
+                        return []RecentRepo{}, nil
+                }
+                return nil, err
+        }
+        var rec struct {
+                Repos []RecentRepo `json:"repos"`
+        }
+        if err := json.Unmarshal(data, &rec); err != nil {
+                return nil, err
+        }
+        sort.Slice(rec.Repos, func(i, j int) bool {
+                return rec.Repos[i].LastOpened.After(rec.Repos[j].LastOpened)
+        })
+        if len(rec.Repos) > 5 {
+                rec.Repos = rec.Repos[:5]
+        }
+        return rec.Repos, nil
 }
 
 // addRecent records a repo path, moving it to the front and limiting to five entries.
 func (r *RepoService) addRecent(path string) error {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	data := struct {
-		Paths []string `json:"paths"`
-	}{}
-	if b, err := os.ReadFile(r.recentPath); err == nil {
-		_ = json.Unmarshal(b, &data)
-	}
-	// remove if exists
-	filtered := []string{path}
-	for _, p := range data.Paths {
-		if p != path {
-			filtered = append(filtered, p)
-		}
-	}
-	if len(filtered) > 5 {
-		filtered = filtered[:5]
-	}
-	data.Paths = filtered
-	b, err := json.MarshalIndent(data, "", "  ")
-	if err != nil {
-		return err
-	}
-	return os.WriteFile(r.recentPath, b, 0o644)
+        r.mu.Lock()
+        defer r.mu.Unlock()
+        data := struct {
+                Repos []RecentRepo `json:"repos"`
+        }{}
+        if b, err := os.ReadFile(r.recentPath); err == nil {
+                _ = json.Unmarshal(b, &data)
+        }
+        entry := RecentRepo{Path: path, LastOpened: time.Now()}
+        filtered := []RecentRepo{entry}
+        for _, p := range data.Repos {
+                if p.Path != path {
+                        filtered = append(filtered, p)
+                }
+        }
+        if len(filtered) > 5 {
+                filtered = filtered[:5]
+        }
+        data.Repos = filtered
+        b, err := json.MarshalIndent(data, "", "  ")
+        if err != nil {
+                return err
+        }
+        return os.WriteFile(r.recentPath, b, 0o644)
 }
 
 // Open opens an existing git repository and ensures required directories.

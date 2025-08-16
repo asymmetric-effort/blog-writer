@@ -26,7 +26,7 @@ describe('App', () => {
     vi.useFakeTimers();
     render(<App />);
     vi.advanceTimersByTime(15000);
-    expect(await screen.findByText('Blog Repo Wizard')).toBeInTheDocument();
+    expect(await screen.findByText('Open')).toBeInTheDocument();
     vi.useRealTimers();
   });
 });
