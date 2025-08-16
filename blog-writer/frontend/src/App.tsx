@@ -35,12 +35,12 @@ export default function App(): JSX.Element {
     <div id="App" className="app-window">
       <MenuBar />
       <div className="main-area">
-        <FileTree repo={repo} onSelect={setFile} />
         <div className="editor-container">
           <Editor />
         </div>
+        <FileTree repo={repo} onSelect={setFile} />
       </div>
-      <StatusBar repo={repo} file={file} />
+      <StatusBar repo={repo} file={file} wizardOpen={showRepoWizard} />
       <Modal open={showRepoWizard}>
         {showLogo ? <img src={logo} alt="logo" /> : <RepoWizard onOpen={handleOpen} />}
       </Modal>

@@ -11,7 +11,12 @@ import StatusBar from '../StatusBar';
  */
 describe('StatusBar', () => {
   it('shows repository and file info', () => {
-    render(<StatusBar repo="/repo" file="file.txt" />);
+    render(<StatusBar repo="/repo" file="file.txt" wizardOpen={false} />);
     expect(screen.getByText('/repo - file.txt')).toBeInTheDocument();
+  });
+
+  it('shows repo wizard hint when open', () => {
+    render(<StatusBar repo="" file="" wizardOpen />);
+    expect(screen.getByText('Open or create a blog content repository.')).toBeInTheDocument();
   });
 });
