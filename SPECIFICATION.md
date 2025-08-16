@@ -53,6 +53,23 @@ All project code and tooling must be written exclusively in **Go**, **Node.js**,
 
 * WYSIWYG editor powered by **React Quill**, metadata form, JSON preview, Git panel, diagnostics.
 * LaTeX preview (e.g., KaTeX) — preview only; persisted payload is TeX string.
+* UI components leverage the **SlateUI** toolkit to deliver a consistent design system:
+  * `@slateui/core` — primitives (focus mgmt, overlay, portal, popper, measurements), utilities, theming engine, design tokens.
+  * `@slateui/layout` — HBox/VBox/Grid/Border/Fit/Card/Anchor layout components.
+  * `@slateui/typography` — text, headings, code, truncation/ellipsis.
+  * `@slateui/forms` — inputs, selects, combo box, number/date pickers, validation, form binding.
+  * `@slateui/data` — data store, model, filters/sorters/groupers, selection, paging, REST/GraphQL adapters.
+  * `@slateui/grid` — virtualized grid/tree grid with column menus, locking, grouping, summaries, drag‑reorder, resize.
+  * `@slateui/tree` — tree + checkbox tree with keyboard navigation.
+  * `@slateui/panels` — panel, window/dialog, tabs, accordion, toolbars, status bar.
+  * `@slateui/charts` — adapter layer (Chart.js/Observable Plot/D3), unified theming & interaction model.
+  * `@slateui/icons` — MIT icon set (e.g., RemixIcon or custom), consistent sizing/ARIA.
+  * `@slateui/theme-classic` — visual theme mimicking Ext JS Classic (colors, spacing, masks, shadows, states).
+  * `@slateui/theme-modern` — optional theme mimicking Ext Modern.
+  * `@slateui/compat` — optional config‑object facade for easier migration (maps Ext‑like configs → React props; no class system clone).
+  * `@slateui/cli` — scaffolding, theme generation, code mods, token extraction.
+  * `@slateui/docs` — Docusaurus site with API docs, storybook links, UX parity matrices, a11y notes.
+  * `@slateui/playground` — live examples + performance & a11y testbeds.
 
 **Bindings**
 
