@@ -16,6 +16,7 @@ interface FileTreeProps {
 }
 
 export default function FileTree({ repo, onSelect }: FileTreeProps): JSX.Element {
+  const NAV_WIDTH = 150; // Navigation pane fixed width in pixels.
   const [files, setFiles] = useState<string[]>([]);
   useEffect(() => {
     if (repo) {
@@ -24,13 +25,16 @@ export default function FileTree({ repo, onSelect }: FileTreeProps): JSX.Element
       setFiles([]);
     }
   }, [repo]);
-  return (
-    <ul className="file-tree">
-      {files.map(f => (
-        <li key={f}>
-          <button onClick={() => onSelect(f)}>{f}</button>
-        </li>
-      ))}
-    </ul>
-  );
+    return (
+      <ul
+        className="file-tree"
+        style={{ width: `${NAV_WIDTH}px`, flex: `0 0 ${NAV_WIDTH}px` }}
+      >
+        {files.map(f => (
+          <li key={f}>
+            <button onClick={() => onSelect(f)}>{f}</button>
+          </li>
+        ))}
+      </ul>
+    );
 }

@@ -12,14 +12,16 @@ import StatusBar from './components/StatusBar';
 import FileTree from './components/FileTree';
 import logo from './assets/images/logo-universal.png';
 
-/**
- * App renders the WYSIWYG editor with a modal repo wizard.
- */
+  /**
+   * App renders the WYSIWYG editor with a modal repo wizard and
+   * a fixed-width file navigation tree.
+   */
 export default function App(): JSX.Element {
   const [showRepoWizard, setShowRepoWizard] = useState(true);
   const [showLogo, setShowLogo] = useState(true);
   const [repo, setRepo] = useState('');
   const [file, setFile] = useState('');
+  const editorStyle: React.CSSProperties = { flex: 1, display: 'flex' };
 
   useEffect(() => {
     const t = setTimeout(() => setShowLogo(false), 15000);
@@ -32,18 +34,18 @@ export default function App(): JSX.Element {
   };
 
   return (
-    <div id="App" className="app-window">
-      <MenuBar />
-      <div className="main-area">
-        <div className="editor-container">
-          <Editor />
+      <div id="App" className="app-window">
+        <MenuBar />
+        <div className="main-area">
+          <FileTree repo={repo} onSelect={setFile} />
+          <div className="editor-container" style={editorStyle}>
+            <Editor />
+          </div>
         </div>
-        <FileTree repo={repo} onSelect={setFile} />
+        <StatusBar repo={repo} file={file} wizardOpen={showRepoWizard} />
+        <Modal open={showRepoWizard}>
+          {showLogo ? <img src={logo} alt="logo" /> : <RepoWizard onOpen={handleOpen} />}
+        </Modal>
       </div>
-      <StatusBar repo={repo} file={file} wizardOpen={showRepoWizard} />
-      <Modal open={showRepoWizard}>
-        {showLogo ? <img src={logo} alt="logo" /> : <RepoWizard onOpen={handleOpen} />}
-      </Modal>
-    </div>
   );
 }

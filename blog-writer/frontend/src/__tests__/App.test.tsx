@@ -33,12 +33,25 @@ describe('App', () => {
     vi.useRealTimers();
   });
 
-  it('keeps navigation pane on right when no repository open', () => {
-    render(<App />);
-    const tree = document.querySelector('.main-area .file-tree');
-    expect(tree).not.toBeNull();
-    expect(tree?.previousElementSibling?.className).toContain('editor-container');
-  });
+    it('positions FileTree on the left with fixed width', () => {
+      render(<App />);
+      const tree = document.querySelector('.main-area .file-tree') as HTMLElement;
+      expect(tree).not.toBeNull();
+      const editor = tree.nextElementSibling as HTMLElement;
+      expect(editor.className).toContain('editor-container');
+      const treeStyle = getComputedStyle(tree);
+      expect(treeStyle.width).toBe('150px');
+      expect(treeStyle.flexGrow).toBe('0');
+      expect(treeStyle.flexShrink).toBe('0');
+    });
+
+    it('allows the editor to grow and shrink with the window', () => {
+      render(<App />);
+      const editor = document.querySelector('.editor-container') as HTMLElement;
+      const style = getComputedStyle(editor);
+      expect(style.flexGrow).toBe('1');
+      expect(style.flexShrink).toBe('1');
+    });
 
   it('shows repo wizard status message', () => {
     render(<App />);
