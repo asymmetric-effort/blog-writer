@@ -48,7 +48,13 @@ describe('DirectoryPicker', () => {
     await waitFor(() => expect(DirSvc.Create).toHaveBeenCalledWith('/tmp', 'foo'));
   });
 
-  it('limits tree height and enables scrolling', async () => {
+  it('has 5px radius and bevelled outset border', () => {
+    const onChange = vi.fn();
+    const { getByRole } = render(<DirectoryPicker onChange={onChange} />);
+    const button = getByRole('button', { name: /browse/i });
+    expect(button).toHaveStyle({ borderRadius: '5px', borderStyle: 'outset' });
+
+    it('limits tree height and enables scrolling', async () => {
     (DirSvc.List as any).mockResolvedValue([]);
     const { getByRole, getByTestId } = render(<DirectoryPicker onChange={() => {}} />);
     fireEvent.click(getByRole('button', { name: /browse/i }));
