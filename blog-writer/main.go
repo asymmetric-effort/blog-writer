@@ -2,13 +2,14 @@
 package main
 
 import (
-  "embed"
+	"embed"
 
-  "github.com/wailsapp/wails/v2/pkg/menu"
-  "github.com/wailsapp/wails/v2/pkg/options"
-  "github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	wails "github.com/wailsapp/wails/v2"
+	"github.com/wailsapp/wails/v2/pkg/menu"
+	"github.com/wailsapp/wails/v2/pkg/options"
+	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 
-  "blog-writer/internal/services"
+	"blog-writer/internal/services"
 )
 
 //go:embed all:frontend/dist
