@@ -37,6 +37,7 @@ func (a *App) ShowAbout(data *menu.CallbackData) {
 	runtime.MessageDialog(a.ctx, runtime.MessageDialogOptions{
 		Title:   "About",
 		Message: about.Info(),
+		Icon:    about.Icon(),
 	})
 }
 

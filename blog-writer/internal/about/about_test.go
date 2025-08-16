@@ -1,7 +1,12 @@
 // Copyright (c) 2025 Asymmetric Effort, LLC. <scaldwell@asymmetric-effort.com>
 package about
 
-import "testing"
+import (
+	"bytes"
+	"os"
+	"path/filepath"
+	"testing"
+)
 
 // TestInfo verifies that Info returns the correct about message.
 func TestInfo(t *testing.T) {
@@ -35,5 +40,17 @@ P.S. Fuck Trump and the uneducated, uninformed dimwits who elected him!
 
 	if Info() != expected {
 		t.Errorf("expected about info to match\n%s\n got\n%s", expected, Info())
+	}
+}
+
+// TestIcon verifies that Icon returns the expected image data.
+func TestIcon(t *testing.T) {
+	expected, err := os.ReadFile(filepath.Join("..", "..", "..", "docs", "blog-writer.png"))
+	if err != nil {
+		t.Fatalf("unable to read icon file: %v", err)
+	}
+
+	if !bytes.Equal(Icon(), expected) {
+		t.Errorf("icon bytes do not match test fixture")
 	}
 }
