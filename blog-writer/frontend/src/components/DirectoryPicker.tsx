@@ -41,14 +41,15 @@ export default function DirectoryPicker({ onChange, ...rest }: DirectoryPickerPr
 
   /**
    * Extracts the directory path from the chosen file when using the fallback
-   * input element.
+   * input element. Handles both POSIX and Windows path separators.
    */
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
       const file = files[0] as File & { path?: string };
       const fullPath = file.path || '';
-      const dir = fullPath.substring(0, fullPath.lastIndexOf('/'));
+      const separator = fullPath.includes('/') ? '/' : '\\';
+      const dir = fullPath.substring(0, fullPath.lastIndexOf(separator));
       onChange(dir);
     }
   }, [onChange]);

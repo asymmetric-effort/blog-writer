@@ -12,7 +12,7 @@ import RepoWizard from '../RepoWizard';
 describe('RepoWizard', () => {
   beforeEach(() => {
     const svc = (window as any).go.services.RepoService;
-    svc.Recent.mockResolvedValue([{ path: 'r1', lastOpened: '2024-01-01T00:00:00Z' }]);
+    svc.Recent.mockResolvedValue(['r1']);
     svc.Open.mockResolvedValue(undefined);
     svc.Create.mockResolvedValue(undefined);
   });
@@ -23,6 +23,16 @@ describe('RepoWizard', () => {
     const row = await screen.findByText('r1');
     fireEvent.doubleClick(row);
     await waitFor(() => expect(onOpen).toHaveBeenCalledWith('r1'));
+  });
+
+  it('opens repository when selected via directory picker on Windows paths', async () => {
+    const onOpen = vi.fn();
+    const { container } = render(<RepoWizard onOpen={onOpen} />);
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['content'], 'C:\\Users\\Bob\\repo\\a.txt');
+    Object.defineProperty(file, 'path', { value: 'C:\\Users\\Bob\\repo\\a.txt' });
+    fireEvent.change(input, { target: { files: [file] } });
+    await waitFor(() => expect(onOpen).toHaveBeenCalledWith('C:\\Users\\Bob\\repo'));
   });
 
   it('switches to Create tab', () => {
