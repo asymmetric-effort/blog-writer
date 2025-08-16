@@ -1,0 +1,8 @@
+/* Copyright (c) 2025 blog-writer authors */
+
+.status-bar {
+  height: 24px;
+  line-height: 24px;
+  background: #eee;
+  padding-left: 8px;
+}

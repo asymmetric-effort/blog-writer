@@ -18,6 +18,15 @@ describe('App', () => {
   it('renders RepoWizard inside a modal dialog', () => {
     render(<App />);
     expect(screen.getByRole('dialog')).toBeInTheDocument();
-    expect(screen.getByText('Blog Repo Wizard')).toBeInTheDocument();
+    // initial logo shown
+    expect(screen.getByRole('img')).toBeInTheDocument();
+  });
+
+  it('shows RepoWizard after logo delay', async () => {
+    vi.useFakeTimers();
+    render(<App />);
+    vi.advanceTimersByTime(15000);
+    expect(await screen.findByText('Blog Repo Wizard')).toBeInTheDocument();
+    vi.useRealTimers();
   });
 });

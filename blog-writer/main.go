@@ -18,11 +18,12 @@ var assets embed.FS
 func main() {
 	// Create services
 	app := NewApp()
-	repoSvc, err := services.NewRepoService()
-	if err != nil {
-		println("Error:", err.Error())
-		return
-	}
+       repoSvc, err := services.NewRepoService()
+       if err != nil {
+               println("Error:", err.Error())
+               return
+       }
+       treeSvc := services.NewTreeService()
 
 	// Create application menu.
 	appMenu := menu.NewMenu()
@@ -40,11 +41,12 @@ func main() {
 		Menu:             appMenu,
 		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
 		OnStartup:        app.startup,
-		Bind: []interface{}{
-			app,
-			repoSvc,
-		},
-	})
+               Bind: []interface{}{
+                       app,
+                       repoSvc,
+                       treeSvc,
+               },
+       })
 
 	if err != nil {
 		println("Error:", err.Error())
