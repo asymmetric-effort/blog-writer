@@ -22,7 +22,9 @@ export default function DirectoryPicker({ onChange, ...rest }: DirectoryPickerPr
 
   /**
    * Triggers directory selection using File System Access API or the fallback
-   * file input when unsupported.
+   * file input when unsupported. Some environments (e.g., Wails) return a
+   * string path instead of a directory handle; this function normalizes the
+   * result and falls back to the hidden input if a path cannot be determined.
    */
   const handleClick = useCallback(async () => {
     try {
@@ -30,9 +32,15 @@ export default function DirectoryPicker({ onChange, ...rest }: DirectoryPickerPr
       if (window.showDirectoryPicker) {
         // @ts-ignore
         const handle = await window.showDirectoryPicker();
-        const path = (handle as any).path || (handle as any).name || '';
-        onChange(path);
-        return;
+        if (typeof handle === 'string') {
+          onChange(handle);
+          return;
+        }
+        const path = (handle as any).path || (handle as any).name;
+        if (path) {
+          onChange(path);
+          return;
+        }
       }
     } catch {
       // Ignore and fall back to the hidden input below.
