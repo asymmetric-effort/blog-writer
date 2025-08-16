@@ -41,7 +41,7 @@ export default function App(): JSX.Element {
         <FileTree repo={repo} onSelect={setFile} />
       </div>
       <StatusBar repo={repo} file={file} wizardOpen={showRepoWizard} />
-      <Modal open={showRepoWizard}>
+      <Modal open={showRepoWizard} title="Open/Create Blog Content Repository">
         {showLogo ? <img src={logo} alt="logo" /> : <RepoWizard onOpen={handleOpen} />}
       </Modal>
     </div>
