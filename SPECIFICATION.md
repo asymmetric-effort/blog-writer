@@ -8,6 +8,7 @@
 | Save model | **Save = write + Git commit** (Autosave = write only, configurable)                             |
 | Media      | Images converted to **sanitized SVG** and **embedded as Base64 data URIs**                      |
 | Math       | LaTeX (inline & display) stored as TeX source in `math` nodes; previewed in‑app (renderer only) |
+| Languages  | Only **Go** and **Node.js/TypeScript** may be used; **Python** and **shell scripting** are forbidden |
 
 ---
 
@@ -34,6 +35,8 @@ Once a repository is opened or created, the application navigates to the editor 
 ---
 
 ## 2. Architecture (Go + Wails)
+
+All project code and tooling must be written exclusively in **Go**, **Node.js**, or **TypeScript**. **Python** and **shell scripting** are prohibited throughout the codebase and build pipeline.
 
 **Backend (Go / Wails)**
 
