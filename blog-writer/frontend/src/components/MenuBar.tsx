@@ -10,6 +10,7 @@ import Modal from './Modal';
 import About from './About';
 import Documentation from './Documentation';
 import BugReport from './BugReport';
+import HelpIcon from './icons/HelpIcon';
 
 /** Interface describing a toolbar action. */
 interface Action {
@@ -65,11 +66,12 @@ export function MenuBar(): JSX.Element {
         <button
           type="button"
           className="menu-button"
+          aria-label="Help"
           aria-haspopup="true"
           aria-expanded={helpOpen}
           onClick={() => setHelpOpen(o => !o)}
         >
-          Help
+          <HelpIcon />
         </button>
         {helpOpen && (
           <ul className="dropdown" role="menu">
