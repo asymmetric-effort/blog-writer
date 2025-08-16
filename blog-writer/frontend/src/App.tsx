@@ -1,33 +1,27 @@
 // Copyright (c) 2025 Sam Caldwell
-import { useState } from 'react';
-import logo from './assets/images/logo-universal.png';
+
+// SPDX-License-Identifier: MIT
+
+import React, { useState } from 'react';
 import './App.css';
-import { Greet } from '../wailsjs/go/main/App';
+import Editor from './components/Editor';
+import RepoWizard from './pages/RepoWizard';
+import Modal from './components/Modal';
 import MenuBar from './components/MenuBar';
 
 /**
- * Main application component renders the greeting sample and the menu bar.
+ * App renders the WYSIWYG editor with a modal repo wizard.
  */
-function App() {
-    const [resultText, setResultText] = useState('Please enter your name below 👇');
-    const [name, setName] = useState('');
-    const updateName = (e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value);
-    const updateResultText = (result: string) => setResultText(result);
+export default function App(): JSX.Element {
+  const [showRepoWizard] = useState(true);
 
-    function greet() {
-        Greet(name).then(updateResultText);
-    }
-
-    return (
-        <div id="App">
-            <MenuBar />
-            <img src={logo} id="logo" alt="logo" />
-            <div id="result" className="result">{resultText}</div>
-            <div id="input" className="input-box">
-                <input id="name" className="input" onChange={updateName} autoComplete="off" name="input" type="text" />
-                <button className="btn" onClick={greet}>Greet</button>
-            </div>
-        </div>
-    );
+  return (
+    <div id="App">
+      <MenuBar />
+      <Editor />
+      <Modal open={showRepoWizard}>
+        <RepoWizard />
+      </Modal>
+    </div>
+  );
 }
-export default App;
