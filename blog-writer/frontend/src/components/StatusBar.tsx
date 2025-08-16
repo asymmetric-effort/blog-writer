@@ -25,5 +25,17 @@ export default function StatusBar({ repo, file, wizardOpen }: StatusBarProps): J
     : repo
     ? `${repoPath} - ${filePath}`
     : '';
-  return <div className="status-bar">{text}</div>;
+  const style: React.CSSProperties = {
+    fontFamily:
+      "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+    background: 'Canvas',
+    color: 'CanvasText',
+    colorScheme: 'light dark',
+    width: '100%',
+  };
+  return (
+    <div className="status-bar" style={style}>
+      {text}
+    </div>
+  );
 }

@@ -5,6 +5,7 @@
     margin: 0;
     padding: 0;
     list-style: none;
+    height: 100%;
   }
 .file-tree li button {
   display: block;
