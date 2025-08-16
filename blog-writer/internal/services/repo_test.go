@@ -1,4 +1,4 @@
-// Copyright (c) 2024 blog-writer authors
+// Copyright (c) 2025 blog-writer authors
 package services
 
 import (
@@ -6,13 +6,12 @@ import (
 	"path/filepath"
 	"strconv"
 	"testing"
-	"time"
 )
 
 // TestRecent ensures recent repos list maintains order, limit, and timestamps.
 func TestRecent(t *testing.T) {
-	cfg := t.TempDir()
-	svc := NewRepoServiceWithDir(cfg)
+	cfgFile := filepath.Join(t.TempDir(), "config.yml")
+	svc := NewRepoServiceWithPath(cfgFile)
 
 	root := t.TempDir()
 	for i := 0; i < 6; i++ {
@@ -23,7 +22,6 @@ func TestRecent(t *testing.T) {
 		if err := svc.Open(p); err != nil {
 			t.Fatalf("open: %v", err)
 		}
-		time.Sleep(10 * time.Millisecond)
 	}
 	rec, err := svc.Recent()
 	if err != nil {
@@ -32,20 +30,17 @@ func TestRecent(t *testing.T) {
 	if len(rec) != 5 {
 		t.Fatalf("expected 5 recents, got %d", len(rec))
 	}
-	for _, r := range rec {
-		if r.LastOpened.IsZero() {
-			t.Fatalf("expected LastOpened to be set for %s", r.Path)
-		}
+	// ensure most recent is last opened
+	expectedFirst := filepath.Join(root, "repo5")
+	if rec[0] != expectedFirst {
+		t.Fatalf("expected %s at front, got %s", expectedFirst, rec[0])
 	}
 	target := filepath.Join(root, "repo3")
 	if err := svc.Open(target); err != nil {
 		t.Fatalf("open: %v", err)
 	}
 	rec, _ = svc.Recent()
-	if rec[0].Path != target {
-		t.Fatalf("expected %s at front, got %s", target, rec[0].Path)
-	}
-	if !rec[0].LastOpened.After(rec[1].LastOpened) {
-		t.Fatalf("expected %s to have latest timestamp", target)
+	if rec[0] != target {
+		t.Fatalf("expected %s at front after reopen, got %s", target, rec[0])
 	}
 }
