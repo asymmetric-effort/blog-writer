@@ -17,6 +17,17 @@ interface RepoWizardProps {
   onOpen: (path: string) => void;
 }
 
+/**
+ * Render table cell text, using a non-breaking space to maintain row height
+ * when the value is blank.
+ *
+ * @param value - Text content for a table cell.
+ * @returns The provided value or a non-breaking space if empty.
+ */
+function cellText(value: string): string {
+  return value || '\u00A0';
+}
+
 export default function RepoWizard({ onOpen }: RepoWizardProps) {
   const [tab, setTab] = useState<'open' | 'create'>('open');
   const [hover, setHover] = useState<'open' | 'create' | null>(null);
@@ -118,8 +129,12 @@ export default function RepoWizard({ onOpen }: RepoWizardProps) {
                   data-testid="recent-row"
                   onDoubleClick={r.path ? () => openRecent(r.path) : undefined}
                 >
-                  <td>{r.path}</td>
-                  <td>{r.lastOpened ? new Date(r.lastOpened).toLocaleString() : ''}</td>
+                  <td>{cellText(r.path)}</td>
+                  <td>
+                    {cellText(
+                      r.lastOpened ? new Date(r.lastOpened).toLocaleString() : ''
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
