@@ -8,14 +8,21 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/menu"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+
+	"blog-writer/internal/services"
 )
 
 //go:embed all:frontend/dist
 var assets embed.FS
 
 func main() {
-	// Create an instance of the app structure.
+	// Create services
 	app := NewApp()
+	repoSvc, err := services.NewRepoService()
+	if err != nil {
+		println("Error:", err.Error())
+		return
+	}
 
 	// Create application menu.
 	appMenu := menu.NewMenu()
@@ -35,6 +42,7 @@ func main() {
 		OnStartup:        app.startup,
 		Bind: []interface{}{
 			app,
+			repoSvc,
 		},
 	})
 

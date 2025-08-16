@@ -115,15 +115,14 @@ tasks:
 
   - id: editor-ui
     name: React editor shell + mapping (IR ⇄ editor state)
-    desc: Implement WYSIWYG with h1–h5, p, span, b/i/u, code, br, ol/ul/li, blockquote, pre, hr, img, math.
+    desc: Implement baseline WYSIWYG editor using **React Quill** that displays after a repository is opened or created; support basic text editing.
     outputs:
       - frontend/src/components/Editor.tsx
-      - frontend/src/components/Toolbar.tsx
-      - frontend/src/lib/serde.ts
-      - frontend/src/components/MathBlock.tsx
+      - frontend/src/components/__tests__/Editor.test.tsx
     depends_on: [bindings, schema-types]
     acceptance:
-      - Round-trip JSON fidelity on sample doc (golden test)
+      - Editor renders on repo open
+      - Render test passes in CI
 
   - id: repo-wizard
     name: Startup Repo Wizard UI
