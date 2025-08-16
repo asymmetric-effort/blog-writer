@@ -62,4 +62,29 @@ describe('RepoWizard', () => {
     const wizard = screen.getByTestId('repo-wizard');
     expect(wizard).toHaveStyle({ width: '400px', height: '300px' });
   });
+
+  it('styles tabs, picker, and help text correctly', () => {
+    render(<RepoWizard onOpen={vi.fn()} />);
+    const openTab = screen.getByText('Open');
+    const createTab = screen.getByText('Create');
+    expect(openTab).toHaveStyle('border-top-left-radius: 5px; border-top-right-radius: 5px; margin: 0px;');
+    expect(createTab).toHaveStyle('border-top-left-radius: 5px; border-top-right-radius: 5px; margin: 0px;');
+    expect(createTab).toHaveStyle('border-bottom: 1px solid black');
+    const picker = screen.getAllByTestId('path-picker')[0];
+    expect(picker).toHaveStyle({ height: '25px', marginTop: '20px' });
+    const hint = screen.getByText(/Select or create/);
+    expect(hint.parentElement?.lastElementChild).toBe(hint);
+    fireEvent.click(createTab);
+    expect(openTab).toHaveStyle('border-bottom: 1px solid black');
+    const hintCreate = screen.getByText(/Choose a parent folder/);
+    expect(hintCreate.parentElement?.lastElementChild).toBe(hintCreate);
+  });
+
+  it('renders five recent placeholders when empty', async () => {
+    const svc = (window as any).go.services.RepoService;
+    svc.Recent.mockResolvedValue([]);
+    render(<RepoWizard onOpen={vi.fn()} />);
+    const rows = await screen.findAllByTestId('recent-row');
+    expect(rows).toHaveLength(5);
+  });
 });

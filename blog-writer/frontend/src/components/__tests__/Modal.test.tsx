@@ -12,7 +12,7 @@ import { describe, it, expect } from 'vitest';
 describe('Modal', () => {
   it('applies 5px border radius', () => {
     render(
-      <Modal open>
+      <Modal open title="t">
         <div>content</div>
       </Modal>
     );
@@ -22,7 +22,7 @@ describe('Modal', () => {
 
   it('renders translucent backdrop when open', () => {
     render(
-      <Modal open>
+      <Modal open title="t">
         <div>content</div>
       </Modal>
     );
