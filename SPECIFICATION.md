@@ -1,7 +1,7 @@
 # SPECIFICATION.md — blog-writer (v1.1 Draft, Go + Wails)
 
 | KEY        | VALUE                                                                                           |
-| ---------- | ----------------------------------------------------------------------------------------------- |
+|------------|-------------------------------------------------------------------------------------------------|
 | Artifact   | Free‑standing **Go + Wails** desktop application with **React + TypeScript** frontend           |
 | OS/Arch    | Windows, Linux, macOS — x64 (amd64) and arm64                                                   |
 | Scope      | Offline WYSIWYG editor for authoring blog articles as JSON files in a Git repo                  |
@@ -25,8 +25,9 @@ On startup the app presents a wizard with three choices:
 2. **Open recent repo** (pick from the last N local repos).
 3. **Create local repo from remote**:
 
-  * Inputs: **GitHub SSH URL** (e.g. `git@github.com:org/repo.git`) and **local path**.
-  * Actions: `git init` → `git remote add origin <ssh-url>` → optional `git fetch` → create `blog/` and `.blog-writer/` → initial commit → optional `git push -u origin <branch>`.
+* Inputs: **GitHub SSH URL** (e.g. `git@github.com:org/repo.git`) and **local path**.
+* Actions: `git init` → `git remote add origin <ssh-url>` → optional `git fetch` → create `blog/` and `.blog-writer/` →
+  initial commit → optional `git push -u origin <branch>`.
 
 Once a repository is opened or created, the application navigates to the editor view where users can author content using a React-based WYSIWYG editor.
 
@@ -79,7 +80,8 @@ repo-root/
     settings.json
 ```
 
-* **Article ID / filename:** Unix epoch seconds at creation time (as string). On collision, wait up to 2s, then increment `+1s` until free.
+* **Article ID / filename:** Unix epoch seconds at creation time (as string). On collision, wait up to 2s, then
+  increment `+1s` until free.
 * **Scanning rule:** Load all `blog/**/<epoch>.json` files.
 
 ### 3.1 Repository Settings (`.blog-writer/settings.json`)
@@ -94,8 +96,15 @@ repo-root/
   "preCommitValidate": true,
   "maxEmbeddedSvgBytes": 10485760,
   "maxSvgNodeCount": 100000,
-  "imageVectorization": { "mode": "auto", "threshold": 0.6, "colors": 8 },
-  "autosave": { "enabled": true, "intervalMs": 15000 }
+  "imageVectorization": {
+    "mode": "auto",
+    "threshold": 0.6,
+    "colors": 8
+  },
+  "autosave": {
+    "enabled": true,
+    "intervalMs": 15000
+  }
 }
 ```
 
@@ -103,7 +112,8 @@ repo-root/
 
 ## 4. Canonical JSON Data Model (Concise `tag` Schema)
 
-Each node uses a **`tag`** discriminator and a **`content`** field (string or `Node[]`). Additional attributes are tag‑specific.
+Each node uses a **`tag`** discriminator and a **`content`** field (string or `Node[]`). Additional attributes are
+tag‑specific.
 
 ### 4.1 File Envelope
 
@@ -116,9 +126,13 @@ Each node uses a **`tag`** discriminator and a **`content`** field (string or `N
     "description": "string",
     "publicationDate": "RFC3339 string",
     "updatedDate": "RFC3339 string",
-    "keywords": ["string"]
+    "keywords": [
+      "string"
+    ]
   },
-  "document": ["Node"]
+  "document": [
+    "Node"
+  ]
 }
 ```
 
@@ -127,16 +141,20 @@ Each node uses a **`tag`** discriminator and a **`content`** field (string or `N
 * **Headings:** `h1` | `h2` | `h3` | `h4` | `h5` → `{ tag:"h1".."h5", content: Node[] }`
 * **Paragraph:** `p` → `{ tag:"p", content: Node[] }`
 * **Inline text:** `span` → `{ tag:"span", content: string }`
-* **Inline emphasis/presentation:** `b`, `i`, `u`, `strong`, `em`, `code`, `sub`, `sup`, `s`, `mark`, `small` → `{ tag:<name>, content: Node[]|string }`
+* **Inline emphasis/presentation:
+  ** `b`, `i`, `u`, `strong`, `em`, `code`, `sub`, `sup`, `s`, `mark`, `small` → `{ tag:<name>, content: Node[]|string }`
 * **Line break:** `br` → `{ tag:"br" }`
-* **Math (LaTeX):** Inline `{ tag:"math", mode:"inline", content: string }`; Display `{ tag:"math", mode:"display", content: string, numbered?: boolean, label?: string }`
+* **Math (LaTeX):** Inline `{ tag:"math", mode:"inline", content: string }`;
+  Display `{ tag:"math", mode:"display", content: string, numbered?: boolean, label?: string }`
 * **Image (embedded SVG):** `{ tag:"img", url:"data:image/svg+xml;base64,<...>", alt?: string }`
 * **Quote:** `blockquote` → `{ tag:"blockquote", content: Node[] }`
 * **Lists:** `ol`/`ul` containers (optional `start`), `li` items.
 * **Code block:** `pre` → `{ tag:"pre", lang?: string, content: string }`
 * **Rule:** `hr` → `{ tag:"hr" }`
 * **Tables (optional):** `table` → `tr` → `th`/`td` with `content: Node[]`.
-* **HTML5 semantic containers:** `header`, `footer`, `main`, `section`, `article`, `aside`, `nav`, `figure`, `figcaption`, `time` (with optional `datetime`).
+* **HTML5 semantic containers:
+  ** `header`, `footer`, `main`, `section`, `article`, `aside`, `nav`, `figure`, `figcaption`, `time` (with
+  optional `datetime`).
 
 ### 4.3 Canonical Example
 
@@ -149,31 +167,118 @@ Each node uses a **`tag`** discriminator and a **`content`** field (string or `N
     "description": "Inline b/i/u, br, img, HTML5 semantics, and LaTeX.",
     "publicationDate": "2025-08-15T00:00:00Z",
     "updatedDate": "2025-08-15T00:00:00Z",
-    "keywords": ["intro", "math", "latex", "semantics"]
+    "keywords": [
+      "intro",
+      "math",
+      "latex",
+      "semantics"
+    ]
   },
   "document": [
-    {"tag":"header","content":[{"tag":"h1","content":[{"tag":"span","content":"LaTeX Demo"}]}]},
-    {"tag":"section","content":[
-      {"tag":"p","content":[
-        {"tag":"span","content":"Einstein's equation "},
-        {"tag":"math","mode":"inline","content":"E=mc^2"},
-        {"tag":"span","content":" relates mass and energy."},
-        {"tag":"br"}
-      ]},
-      {"tag":"math","mode":"display","content":"\\int_{-\\infty}^{\\infty} e^{-x^2} \\; dx = \\sqrt{\\pi}","numbered":true,"label":"eq:gaussian"}
-    ]},
-    {"tag":"figure","content":[
-      {"tag":"img","url":"data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PScwIDAgMTAwIDEwMCc+PC9zdmc+","alt":"diagram"},
-      {"tag":"figcaption","content":[{"tag":"span","content":"Gaussian integral diagram"}]}
-    ]},
-    {"tag":"article","content":[
-      {"tag":"p","content":[
-        {"tag":"span","content":"Inline code example: "},
-        {"tag":"code","content":[{"tag":"span","content":"x = y * z;"}]}
-      ]},
-      {"tag":"pre","lang":"cpp","content":"// example\nint main(){return 0;}"}
-    ]},
-    {"tag":"footer","content":[{"tag":"time","datetime":"2025-08-15T00:00:00Z","content":"Updated"}]}
+    {
+      "tag": "header",
+      "content": [
+        {
+          "tag": "h1",
+          "content": [
+            {
+              "tag": "span",
+              "content": "LaTeX Demo"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "tag": "section",
+      "content": [
+        {
+          "tag": "p",
+          "content": [
+            {
+              "tag": "span",
+              "content": "Einstein's equation "
+            },
+            {
+              "tag": "math",
+              "mode": "inline",
+              "content": "E=mc^2"
+            },
+            {
+              "tag": "span",
+              "content": " relates mass and energy."
+            },
+            {
+              "tag": "br"
+            }
+          ]
+        },
+        {
+          "tag": "math",
+          "mode": "display",
+          "content": "\\int_{-\\infty}^{\\infty} e^{-x^2} \\; dx = \\sqrt{\\pi}",
+          "numbered": true,
+          "label": "eq:gaussian"
+        }
+      ]
+    },
+    {
+      "tag": "figure",
+      "content": [
+        {
+          "tag": "img",
+          "url": "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PScwIDAgMTAwIDEwMCc+PC9zdmc+",
+          "alt": "diagram"
+        },
+        {
+          "tag": "figcaption",
+          "content": [
+            {
+              "tag": "span",
+              "content": "Gaussian integral diagram"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "tag": "article",
+      "content": [
+        {
+          "tag": "p",
+          "content": [
+            {
+              "tag": "span",
+              "content": "Inline code example: "
+            },
+            {
+              "tag": "code",
+              "content": [
+                {
+                  "tag": "span",
+                  "content": "x = y * z;"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "tag": "pre",
+          "lang": "cpp",
+          "content": "// example\nint main(){return 0;}"
+        }
+      ]
+    },
+    {
+      "tag": "footer",
+      "content": [
+        {
+          "tag": "time",
+          "datetime": "2025-08-15T00:00:00Z",
+          "content": "Updated"
+        }
+      ]
+    }
   ]
 }
 ```
@@ -186,56 +291,236 @@ Each node uses a **`tag`** discriminator and a **`content`** field (string or `N
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "required": ["version", "metadata", "document"],
+  "required": [
+    "version",
+    "metadata",
+    "document"
+  ],
   "properties": {
-    "version": { "type": "string" },
+    "version": {
+      "type": "string"
+    },
     "metadata": {
       "type": "object",
-      "required": ["title", "author", "description", "publicationDate", "updatedDate", "keywords"],
+      "required": [
+        "title",
+        "author",
+        "description",
+        "publicationDate",
+        "updatedDate",
+        "keywords"
+      ],
       "properties": {
-        "title": { "type": "string", "minLength": 1 },
-        "author": { "type": "string", "minLength": 1 },
-        "description": { "type": "string" },
-        "publicationDate": { "type": "string", "format": "date-time" },
-        "updatedDate": { "type": "string", "format": "date-time" },
-        "keywords": { "type": "array", "items": { "type": "string" } }
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "author": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        },
+        "publicationDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
     },
-    "document": { "type": "array", "items": { "$ref": "#/defs/node" } }
+    "document": {
+      "type": "array",
+      "items": {
+        "$ref": "#/defs/node"
+      }
+    }
   },
   "defs": {
     "node": {
       "type": "object",
-      "required": ["tag"],
+      "required": [
+        "tag"
+      ],
       "properties": {
-        "tag": { "type": "string", "enum": [
-          "h1", "h2", "h3", "h4", "h5",
-          "p", "span",
-          "b", "i", "u", "strong", "em", "code", "sub", "sup", "s", "mark", "small",
-          "br",
-          "math",
-          "img",
-          "blockquote", "ol", "ul", "li",
-          "pre", "hr",
-          "table", "tr", "th", "td",
-          "header", "footer", "main", "section", "article", "aside", "nav", "figure", "figcaption", "time"
-        ] },
+        "tag": {
+          "type": "string",
+          "enum": [
+            "h1",
+            "h2",
+            "h3",
+            "h4",
+            "h5",
+            "p",
+            "span",
+            "b",
+            "i",
+            "u",
+            "strong",
+            "em",
+            "code",
+            "sub",
+            "sup",
+            "s",
+            "mark",
+            "small",
+            "br",
+            "math",
+            "img",
+            "blockquote",
+            "ol",
+            "ul",
+            "li",
+            "pre",
+            "hr",
+            "table",
+            "tr",
+            "th",
+            "td",
+            "header",
+            "footer",
+            "main",
+            "section",
+            "article",
+            "aside",
+            "nav",
+            "figure",
+            "figcaption",
+            "time"
+          ]
+        },
         "content": {},
-        "mode": { "type": "string", "enum": ["inline", "display"] },
-        "numbered": { "type": "boolean" },
-        "label": { "type": "string" },
-        "alt": { "type": "string" },
-        "url": { "type": "string", "pattern": "^data:image/svg\\+xml;base64,[A-Za-z0-9+/=]+$" },
-        "lang": { "type": "string" },
-        "start": { "type": "integer", "minimum": 1 },
-        "datetime": { "type": "string" }
+        "mode": {
+          "type": "string",
+          "enum": [
+            "inline",
+            "display"
+          ]
+        },
+        "numbered": {
+          "type": "boolean"
+        },
+        "label": {
+          "type": "string"
+        },
+        "alt": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "pattern": "^data:image/svg\\+xml;base64,[A-Za-z0-9+/=]+$"
+        },
+        "lang": {
+          "type": "string"
+        },
+        "start": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "datetime": {
+          "type": "string"
+        }
       },
       "allOf": [
-        { "if": { "properties": { "tag": { "const": "br" } } }, "then": { "not": { "required": ["content"] } } },
-        { "if": { "properties": { "tag": { "const": "img" } } }, "then": { "required": ["url"] } },
-        { "if": { "properties": { "tag": { "const": "math" } } }, "then": { "required": ["mode", "content"] } },
-        { "if": { "properties": { "tag": { "enum": ["h1","h2","h3","h4","h5","p","blockquote","ol","ul","li","pre","table","tr","th","td","header","footer","main","section","article","aside","nav","figure","figcaption"] } } },
-          "then": { "properties": { "content": { "type": ["array", "string", "null"] } } } }
+        {
+          "if": {
+            "properties": {
+              "tag": {
+                "const": "br"
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": [
+                "content"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "tag": {
+                "const": "img"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "url"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "tag": {
+                "const": "math"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "mode",
+              "content"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "tag": {
+                "enum": [
+                  "h1",
+                  "h2",
+                  "h3",
+                  "h4",
+                  "h5",
+                  "p",
+                  "blockquote",
+                  "ol",
+                  "ul",
+                  "li",
+                  "pre",
+                  "table",
+                  "tr",
+                  "th",
+                  "td",
+                  "header",
+                  "footer",
+                  "main",
+                  "section",
+                  "article",
+                  "aside",
+                  "nav",
+                  "figure",
+                  "figcaption"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "content": {
+                "type": [
+                  "array",
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        }
       ]
     }
   }
@@ -251,7 +536,9 @@ Each node uses a **`tag`** discriminator and a **`content`** field (string or `N
 **Pipeline:**
 
 1. Vectorize raster/PDF to SVG (Potrace‑like for line art; optional color quantization for limited palettes).
-2. Sanitize SVG: remove `script`, external `image` hrefs, `foreignObject`; whitelist core attributes (`d`, `fill`, `stroke`, `stroke-width`, `transform`, `viewBox`, `width`, `height`, `id`, `class`, constrained `style`).
+2. Sanitize SVG: remove `script`, external `image` hrefs, `foreignObject`; whitelist core
+   attributes (`d`, `fill`, `stroke`, `stroke-width`, `transform`, `viewBox`, `width`, `height`, `id`, `class`,
+   constrained `style`).
 3. Minify.
 4. Base64‑encode and embed as `url` in `img` node.
 5. Enforce size/node limits; warn on photographic content fidelity.
@@ -264,7 +551,8 @@ Each node uses a **`tag`** discriminator and a **`content`** field (string or `N
 * **Save** button = write + commit. Default message:
   `chore(article): <id> <title> [create|update|delete]`.
 * **Git panel:** status, staged files, commit/amend, branch switch, pull (rebase), push, side‑by‑side JSON diff.
-* **Safety:** Pre‑commit validation (schema + SVG sanitation + Base64 pattern). Block commit/push on invalid state with diagnostics.
+* **Safety:** Pre‑commit validation (schema + SVG sanitation + Base64 pattern). Block commit/push on invalid state with
+  diagnostics.
 * **Conflicts:** If working tree changed, offer a 3‑way JSON merge with semantic assistance (per‑node diffs for arrays).
 
 ---
@@ -335,13 +623,15 @@ const list = await window.go.services.ArticleService.ListArticles();
 const dataUri = await window.go.services.ImageService.ConvertImageToEmbeddedSVG(filePath);
 ```
 
-**Error model:** Go methods return `error`; surfaced in TS as rejected Promises with `{ code?: string, message: string, details?: any }` after mapping.
+**Error model:** Go methods return `error`; surfaced in TS as rejected Promises
+with `{ code?: string, message: string, details?: any }` after mapping.
 
 ---
 
 ## 9. UX Details
 
-* **Editor:** toolbar for headings (h1–h5), bold/italic/underline, code, lists, quote, hr, link insert, line‑break, inline/display math, image insert (conversion wizard), table builder.
+* **Editor:** toolbar for headings (h1–h5), bold/italic/underline, code, lists, quote, hr, link insert, line‑break,
+  inline/display math, image insert (conversion wizard), table builder.
 * **Metadata panel:** required fields enforced with inline validation.
 * **Diagnostics:** JSON validation and sanitizer report with clickable paths.
 * **JSON preview:** read‑only; mirrors persisted structure.
@@ -385,7 +675,7 @@ name: build-release
 on:
   push:
     tags: [ 'v*' ]
-  workflow_dispatch: {}
+  workflow_dispatch: { }
 
 jobs:
   build:
@@ -469,7 +759,7 @@ module github.com/yourorg/blog-writer
 go 1.24
 
 require (
-	github.com/wailsapp/wails/v2 v2.9.0 // indirect or pinned
+github.com/wailsapp/wails/v2 v2.9.0 // indirect or pinned
 )
 ```
 
@@ -511,13 +801,20 @@ require (
 
 ## 13. Acceptance Criteria (v1.1)
 
-1. On launch, wizard opens existing/recent repo or creates a local repo from SSH URL + path; `blog/` and `.blog-writer/` created if absent, then navigates to the WYSIWYG editor.
-2. WYSIWYG editor supports headings (h1–h5), paragraph, inline emphasis (`b/i/u/strong/em/code/sub/sup/s/mark/small`), `br`, lists, quote, hr, code block, tables (optional), semantic containers (`header/footer/main/section/article/aside/nav/figure/figcaption/time`), **math** (inline & display), and **embedded SVG images**.
-3. **Autosave** writes to disk every 15s and on blur (no commit). **Save** writes and commits using template `chore(article): <id> <title> [create|update|delete]`.
+1. On launch, wizard opens existing/recent repo or creates a local repo from SSH URL + path; `blog/` and `.blog-writer/`
+   created if absent.
+2. WYSIWYG editor supports headings (h1–h5), paragraph, inline
+   emphasis (`b/i/u/strong/em/code/sub/sup/s/mark/small`), `br`, lists, quote, hr, code block, tables (optional),
+   semantic containers (`header/footer/main/section/article/aside/nav/figure/figcaption/time`), **math** (inline &
+   display), and **embedded SVG images**.
+3. **Autosave** writes to disk every 15s and on blur (no commit). **Save** writes and commits using
+   template `chore(article): <id> <title> [create|update|delete]`.
 4. Images are vectorized (if needed), sanitized, minified, and **Base64 embedded** as `img.url` data URIs.
-5. Articles are named by **Unix epoch second** IDs; loader supports `blog/**/<id>.json` and preserves exact structure on reload.
+5. Articles are named by **Unix epoch second** IDs; loader supports `blog/**/<id>.json` and preserves exact structure on
+   reload.
 6. JSON validates against schema; invalid content blocks commit with actionable diagnostics.
-7. GitHub Actions produces binaries for Windows/Linux/macOS on **x64** and **arm64**; artifacts attached to tagged releases.
+7. GitHub Actions produces binaries for Windows/Linux/macOS on **x64** and **arm64**; artifacts attached to tagged
+   releases.
 
 ---
 

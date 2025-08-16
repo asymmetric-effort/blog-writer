@@ -4,6 +4,7 @@
 import React from 'react';
 import './App.css';
 import Editor from './components/Editor';
+import RepoWizard from './pages/RepoWizard';
 
 /**
  * App renders the WYSIWYG editor once a repository is opened or created.
@@ -11,9 +12,12 @@ import Editor from './components/Editor';
 function App(): JSX.Element {
   return (
     <div id="App">
-      <Editor />
+      <div>
+        <Editor />
+      </div>
+      <div>
+        <RepoWizard/>
+      </div>
     </div>
   );
-}
-
 export default App;
