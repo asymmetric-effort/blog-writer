@@ -3,11 +3,14 @@
 /// <reference types="vitest" />
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 import '@testing-library/jest-dom/vitest';
 import FileTree from '../FileTree';
 
 /**
- * Tests for FileTree component ensure files load and selection works.
+ * Tests for FileTree component ensure files load, selection works, and styles follow the system theme.
  */
 describe('FileTree', () => {
   beforeEach(() => {
@@ -37,5 +40,15 @@ describe('FileTree', () => {
     const { container } = render(<FileTree repo="" onSelect={() => {}} />);
     const list = container.querySelector('.file-tree') as HTMLElement;
     expect(list).toHaveStyle('height: 100%');
+  });
+
+  it('uses the system background and a right border', () => {
+    const cssPath = join(dirname(fileURLToPath(import.meta.url)), '../FileTree.css');
+    const css = readFileSync(cssPath, 'utf8');
+    expect(css).toMatch(/background-color:\s*Canvas;/);
+    expect(css).toMatch(/border-right:\s*2px\s+outset;/);
+    const { container } = render(<FileTree repo="" onSelect={() => {}} />);
+    const list = container.querySelector('.file-tree') as HTMLElement;
+    expect(list).toBeInTheDocument();
   });
 });
