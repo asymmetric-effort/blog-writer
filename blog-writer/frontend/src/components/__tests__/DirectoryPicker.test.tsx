@@ -4,15 +4,15 @@
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
-import PathPicker from '../PathPicker';
+import DirectoryPicker from '../DirectoryPicker';
 
 /**
- * Basic interaction test ensuring PathPicker returns a directory path.
+ * Basic interaction test ensuring DirectoryPicker returns a directory path.
  */
-describe('PathPicker', () => {
+describe('DirectoryPicker', () => {
   it('invokes onChange with selected path', () => {
     const onChange = vi.fn();
-    const { container } = render(<PathPicker onChange={onChange} />);
+    const { container } = render(<DirectoryPicker onChange={onChange} />);
     const input = container.querySelector('input') as HTMLInputElement;
     const file = new File(['content'], '/tmp/test/a.txt');
     Object.defineProperty(file, 'path', { value: '/tmp/test/a.txt' });

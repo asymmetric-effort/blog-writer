@@ -73,7 +73,7 @@ describe('RepoWizard', () => {
     expect(createTab).toHaveStyle(
       'border-top: 1px outset #555; border-left: 1px outset #555; border-right: 1px outset #555; border-top-left-radius: 5px; border-top-right-radius: 5px; margin: 0px; border-bottom: 1px solid black'
     );
-    const picker = screen.getAllByTestId('path-picker')[0];
+    const picker = screen.getAllByTestId('directory-picker')[0];
     expect(picker).toHaveStyle({ height: '25px', marginTop: '20px' });
     const hint = screen.getByText(/Select or create/);
     expect(hint.parentElement?.lastElementChild).toBe(hint);
