@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useCallback, useRef } from 'react';
+import { CanResolveFilePaths, ResolveFilePaths } from '../../wailsjs/runtime/runtime';
 
 /**
  * DirectoryPicker renders a directory selector used by RepoWizard forms.
@@ -46,11 +47,20 @@ export default function DirectoryPicker({ onChange, ...rest }: DirectoryPickerPr
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
+      try {
+        if (CanResolveFilePaths()) {
+          ResolveFilePaths(Array.from(files));
+        }
+      } catch {
+        // runtime not available; continue without resolving
+      }
       const file = files[0] as File & { path?: string };
       const fullPath = file.path || '';
-      const separator = fullPath.includes('/') ? '/' : '\\';
-      const dir = fullPath.substring(0, fullPath.lastIndexOf(separator));
-      onChange(dir);
+      if (fullPath) {
+        const separator = fullPath.includes('/') ? '/' : '\\';
+        const dir = fullPath.substring(0, fullPath.lastIndexOf(separator));
+        onChange(dir);
+      }
     }
   }, [onChange]);
 
