@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Copyright (c) 2024 blog-writer authors",
+  "type": "object",
+  "required": ["version", "metadata", "document"],
+  "properties": {
+    "version": { "type": "string" },
+    "metadata": {
+      "type": "object",
+      "required": ["title", "author", "description", "publicationDate", "updatedDate", "keywords"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "author": { "type": "string", "minLength": 1 },
+        "description": { "type": "string" },
+        "publicationDate": { "type": "string", "format": "date-time" },
+        "updatedDate": { "type": "string", "format": "date-time" },
+        "keywords": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "document": { "type": "array", "items": { "$ref": "#/defs/node" } }
+  },
+  "defs": {
+    "node": {
+      "type": "object",
+      "required": ["tag"],
+      "properties": {
+        "tag": {
+          "type": "string",
+          "enum": [
+            "h1", "h2", "h3", "h4", "h5",
+            "p", "span",
+            "b", "i", "u", "strong", "em", "code", "sub", "sup", "s", "mark", "small",
+            "br",
+            "math",
+            "img",
+            "blockquote", "ol", "ul", "li",
+            "pre", "hr",
+            "table", "tr", "th", "td",
+            "header", "footer", "main", "section", "article", "aside", "nav", "figure", "figcaption", "time"
+          ]
+        },
+        "content": {},
+        "mode": { "type": "string", "enum": ["inline", "display"] },
+        "numbered": { "type": "boolean" },
+        "label": { "type": "string" },
+        "alt": { "type": "string" },
+        "url": {
+          "type": "string",
+          "pattern": "^data:image/svg\\+xml;base64,[A-Za-z0-9+/=]+$"
+        },
+        "lang": { "type": "string" },
+        "start": { "type": "integer", "minimum": 1 },
+        "datetime": { "type": "string" }
+      },
+      "allOf": [
+        { "if": { "properties": { "tag": { "const": "br" } } }, "then": { "not": { "required": ["content"] } } },
+        { "if": { "properties": { "tag": { "const": "img" } } }, "then": { "required": ["url"] } },
+        { "if": { "properties": { "tag": { "const": "math" } } }, "then": { "required": ["mode", "content"] } },
+        {
+          "if": {
+            "properties": {
+              "tag": {
+                "enum": ["h1", "h2", "h3", "h4", "h5", "p", "blockquote", "ol", "ul", "li", "pre", "table", "tr", "th", "td", "header", "footer", "main", "section", "article", "aside", "nav", "figure", "figcaption"]
+              }
+            }
+          },
+          "then": { "properties": { "content": { "type": ["array", "string", "null"] } } }
+        }
+      ]
+    }
+  }
+}
