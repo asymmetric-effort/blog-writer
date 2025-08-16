@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+"""CLI entry point for repository version management."""
+
+# Copyright (c) 2025 Sam Caldwell
+# SPDX-License-Identifier: MIT
+
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+
+from versioning_lib import ensure_version_file, run
+
+
+def build_parser() -> argparse.ArgumentParser:
+    """Create and return the argument parser for the CLI."""
+    parser = argparse.ArgumentParser(description="Bump the repository version.")
+    parser.add_argument(
+        "level",
+        nargs="?",
+        choices=["major", "minor", "release"],
+        help="Version part to bump",
+    )
+    return parser
+
+
+def main() -> None:
+    """Entry point for the CLI."""
+    parser = build_parser()
+    args = parser.parse_args()
+    version_file = Path.cwd() / "VERSION"
+    ensure_version_file(version_file)
+
+    if not args.level:
+        parser.print_help()
+        return
+
+    new_version = run(args.level, version_file)
+    print(f"v{new_version[0]}.{new_version[1]}.{new_version[2]}")
+
+
+if __name__ == "__main__":
+    main()
