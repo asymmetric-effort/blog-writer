@@ -1,23 +1,24 @@
 // Copyright (c) 2025 Sam Caldwell
 // SPDX-License-Identifier: MIT
 
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import Editor from './components/Editor';
 import RepoWizard from './pages/RepoWizard';
+import Modal from './components/Modal';
 
 /**
- * App renders the WYSIWYG editor once a repository is opened or created.
+ * App renders the WYSIWYG editor with a modal repo wizard.
  */
-function App(): JSX.Element {
+export default function App(): JSX.Element {
+  const [showRepoWizard] = useState(true);
+
   return (
     <div id="App">
-      <div>
-        <Editor />
-      </div>
-      <div>
-        <RepoWizard/>
-      </div>
+      <Editor />
+      <Modal open={showRepoWizard}>
+        <RepoWizard />
+      </Modal>
     </div>
   );
-export default App;
+}
