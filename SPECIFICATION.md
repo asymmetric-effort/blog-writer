@@ -28,6 +28,8 @@ On startup the app presents a wizard with three choices:
   * Inputs: **GitHub SSH URL** (e.g. `git@github.com:org/repo.git`) and **local path**.
   * Actions: `git init` → `git remote add origin <ssh-url>` → optional `git fetch` → create `blog/` and `.blog-writer/` → initial commit → optional `git push -u origin <branch>`.
 
+Once a repository is opened or created, the application navigates to the editor view where users can author content using a React-based WYSIWYG editor.
+
 ---
 
 ## 2. Architecture (Go + Wails)
@@ -45,7 +47,7 @@ On startup the app presents a wizard with three choices:
 
 **Frontend (React + TypeScript)**
 
-* WYSIWYG editor, metadata form, JSON preview, Git panel, diagnostics.
+* WYSIWYG editor powered by **React Quill**, metadata form, JSON preview, Git panel, diagnostics.
 * LaTeX preview (e.g., KaTeX) — preview only; persisted payload is TeX string.
 
 **Bindings**
@@ -509,7 +511,7 @@ require (
 
 ## 13. Acceptance Criteria (v1.1)
 
-1. On launch, wizard opens existing/recent repo or creates a local repo from SSH URL + path; `blog/` and `.blog-writer/` created if absent.
+1. On launch, wizard opens existing/recent repo or creates a local repo from SSH URL + path; `blog/` and `.blog-writer/` created if absent, then navigates to the WYSIWYG editor.
 2. WYSIWYG editor supports headings (h1–h5), paragraph, inline emphasis (`b/i/u/strong/em/code/sub/sup/s/mark/small`), `br`, lists, quote, hr, code block, tables (optional), semantic containers (`header/footer/main/section/article/aside/nav/figure/figcaption/time`), **math** (inline & display), and **embedded SVG images**.
 3. **Autosave** writes to disk every 15s and on blur (no commit). **Save** writes and commits using template `chore(article): <id> <title> [create|update|delete]`.
 4. Images are vectorized (if needed), sanitized, minified, and **Base64 embedded** as `img.url` data URIs.
