@@ -25,16 +25,27 @@ export default function FileTree({ repo, onSelect }: FileTreeProps): JSX.Element
       setFiles([]);
     }
   }, [repo]);
+  const style: React.CSSProperties = {
+    width: `${NAV_WIDTH}px`,
+    flex: `0 0 ${NAV_WIDTH}px`,
+    height: '100%',
+  };
+  if (!repo) {
     return (
-      <ul
-        className="file-tree"
-        style={{ width: `${NAV_WIDTH}px`, flex: `0 0 ${NAV_WIDTH}px` }}
-      >
-        {files.map(f => (
-          <li key={f}>
-            <button onClick={() => onSelect(f)}>{f}</button>
-          </li>
-        ))}
+      <ul className="file-tree" style={style}>
+        <li>
+          <span aria-label="repository">📜</span>
+        </li>
       </ul>
     );
+  }
+  return (
+    <ul className="file-tree" style={style}>
+      {files.map(f => (
+        <li key={f}>
+          <button onClick={() => onSelect(f)}>{f}</button>
+        </li>
+      ))}
+    </ul>
+  );
 }

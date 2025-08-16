@@ -23,4 +23,12 @@ describe('StatusBar', () => {
     render(<StatusBar repo="" file="" wizardOpen />);
     expect(screen.getByText('Open or create a blog content repository.')).toBeInTheDocument();
   });
+
+  it('uses system fonts and colors', () => {
+    const { container } = render(<StatusBar repo="" file="" wizardOpen={false} />);
+    const bar = container.querySelector('.status-bar') as HTMLElement;
+    const styles = getComputedStyle(bar);
+    expect(styles.fontFamily.toLowerCase()).toContain('system-ui');
+    expect(styles.backgroundColor).not.toBe('');
+  });
 });

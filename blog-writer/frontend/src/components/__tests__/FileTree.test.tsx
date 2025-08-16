@@ -27,4 +27,15 @@ describe('FileTree', () => {
     render(<FileTree repo="" onSelect={onSelect} />);
     expect(screen.getByRole('list')).toBeInTheDocument();
   });
+
+  it('shows repository icon when no repository is open', () => {
+    render(<FileTree repo="" onSelect={() => {}} />);
+    expect(screen.getByLabelText('repository')).toBeInTheDocument();
+  });
+
+  it('limits its height to available space', () => {
+    const { container } = render(<FileTree repo="" onSelect={() => {}} />);
+    const list = container.querySelector('.file-tree') as HTMLElement;
+    expect(list).toHaveStyle('height: 100%');
+  });
 });

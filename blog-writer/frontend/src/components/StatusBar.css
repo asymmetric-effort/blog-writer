@@ -3,6 +3,11 @@
 .status-bar {
   height: 24px;
   line-height: 24px;
-  background: #eee;
+  background: Canvas;
+  color: CanvasText;
   padding-left: 8px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, Helvetica, Arial, sans-serif;
+  color-scheme: light dark;
+  width: 100%;
 }
