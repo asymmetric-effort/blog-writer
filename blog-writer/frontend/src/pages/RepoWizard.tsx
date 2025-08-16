@@ -1,7 +1,7 @@
 // Copyright (c) 2025 blog-writer authors
 import { useEffect, useState } from 'react';
 import { Create, Open, Recent } from '../../wailsjs/go/services/RepoService';
-import PathPicker from '../components/PathPicker';
+import DirectoryPicker from '../components/DirectoryPicker';
 import Grid from '../components/Grid';
 import './RepoWizard.css';
 
@@ -109,9 +109,9 @@ export default function RepoWizard({ onOpen }: RepoWizardProps) {
       </div>
       {tab === 'open' && (
         <div className="open-tab" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <PathPicker
+          <DirectoryPicker
             onChange={handleExisting}
-            data-testid="path-picker"
+            data-testid="directory-picker"
             style={{ height: '25px', marginTop: '20px' }}
           />
           <Grid
@@ -131,9 +131,9 @@ export default function RepoWizard({ onOpen }: RepoWizardProps) {
       )}
       {tab === 'create' && (
         <div className="create-tab" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <PathPicker
+          <DirectoryPicker
             onChange={setParentDir}
-            data-testid="path-picker"
+            data-testid="directory-picker"
             style={{ height: '25px', marginTop: '20px' }}
           />
           <input
