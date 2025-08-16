@@ -39,3 +39,13 @@ func (a *App) ShowAbout(data *menu.CallbackData) {
 		Message: about.Info(),
 	})
 }
+
+// ShowDocs opens the project documentation in the user's default browser.
+func (a *App) ShowDocs(data *menu.CallbackData) {
+	runtime.BrowserOpenURL(a.ctx, "https://github.com/asymmetric-effort/blog-writer/blob/main/docs/user-guide.md")
+}
+
+// ReportBug opens the bug report page in the user's default browser.
+func (a *App) ReportBug(data *menu.CallbackData) {
+	runtime.BrowserOpenURL(a.ctx, "https://github.com/asymmetric-effort/blog-writer/issues/new/choose")
+}
