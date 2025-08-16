@@ -67,15 +67,23 @@ describe('RepoWizard', () => {
     render(<RepoWizard onOpen={vi.fn()} />);
     const openTab = screen.getByText('Open');
     const createTab = screen.getByText('Create');
-    expect(openTab).toHaveStyle('border-top-left-radius: 5px; border-top-right-radius: 5px; margin: 0px;');
-    expect(createTab).toHaveStyle('border-top-left-radius: 5px; border-top-right-radius: 5px; margin: 0px;');
-    expect(createTab).toHaveStyle('border-bottom: 1px solid black');
+    expect(openTab).toHaveStyle(
+      'border-top: 1px outset #555; border-left: 1px outset #555; border-right: 1px outset #555; border-top-left-radius: 5px; border-top-right-radius: 5px; margin: 0px;'
+    );
+    expect(createTab).toHaveStyle(
+      'border-top: 1px outset #555; border-left: 1px outset #555; border-right: 1px outset #555; border-top-left-radius: 5px; border-top-right-radius: 5px; margin: 0px; border-bottom: 1px solid black'
+    );
     const picker = screen.getAllByTestId('path-picker')[0];
     expect(picker).toHaveStyle({ height: '25px', marginTop: '20px' });
     const hint = screen.getByText(/Select or create/);
     expect(hint.parentElement?.lastElementChild).toBe(hint);
     fireEvent.click(createTab);
-    expect(openTab).toHaveStyle('border-bottom: 1px solid black');
+    expect(createTab).toHaveStyle(
+      'border-top: 1px outset #555; border-left: 1px outset #555; border-right: 1px outset #555'
+    );
+    expect(openTab).toHaveStyle(
+      'border-top: 1px outset #555; border-left: 1px outset #555; border-right: 1px outset #555; border-bottom: 1px solid black'
+    );
     const hintCreate = screen.getByText(/Choose a parent folder/);
     expect(hintCreate.parentElement?.lastElementChild).toBe(hintCreate);
   });
