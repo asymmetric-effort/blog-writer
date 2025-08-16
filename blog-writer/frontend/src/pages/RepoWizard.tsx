@@ -14,6 +14,7 @@ interface RepoWizardProps {
 
 export default function RepoWizard({ onOpen }: RepoWizardProps) {
   const [tab, setTab] = useState<'open' | 'create'>('open');
+  const [hover, setHover] = useState<'open' | 'create' | null>(null);
   const [recent, setRecent] = useState<RecentRepo[]>([]);
   const [parentDir, setParentDir] = useState('');
   const [repoName, setRepoName] = useState('');
@@ -58,17 +59,21 @@ export default function RepoWizard({ onOpen }: RepoWizardProps) {
   };
 
   return (
-    <div className="repo-wizard">
+    <div className="repo-wizard" data-testid="repo-wizard" style={{ width: '400px', height: '300px' }}>
       <div className="tabs">
         <button
-          className={tab === 'open' ? 'active' : 'inactive'}
+          className={`${tab === 'open' ? 'active' : 'inactive'} ${hover === 'open' ? 'hovered' : ''}`}
           onClick={() => setTab('open')}
+          onMouseEnter={() => setHover('open')}
+          onMouseLeave={() => setHover(null)}
         >
           Open
         </button>
         <button
-          className={tab === 'create' ? 'active' : 'inactive'}
+          className={`${tab === 'create' ? 'active' : 'inactive'} ${hover === 'create' ? 'hovered' : ''}`}
           onClick={() => setTab('create')}
+          onMouseEnter={() => setHover('create')}
+          onMouseLeave={() => setHover(null)}
         >
           Create
         </button>
@@ -92,6 +97,7 @@ export default function RepoWizard({ onOpen }: RepoWizardProps) {
               ))}
             </tbody>
           </table>
+          <p className="hint">Select or create a repository to begin.</p>
         </div>
       )}
       {tab === 'create' && (
@@ -108,6 +114,7 @@ export default function RepoWizard({ onOpen }: RepoWizardProps) {
             onChange={(e) => setRemote(e.target.value)}
           />
           <button onClick={handleCreate}>Create</button>
+          <p className="hint">Choose a parent folder and repository name.</p>
         </div>
       )}
     </div>

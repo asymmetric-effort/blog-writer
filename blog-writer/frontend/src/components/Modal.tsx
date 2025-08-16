@@ -16,8 +16,25 @@ interface ModalProps {
 export default function Modal({ open, children }: ModalProps): JSX.Element | null {
   if (!open) return null;
   return (
-    <dialog open style={{ borderRadius: '5px' }}>
-      {children}
-    </dialog>
+    <div
+      className="modal-overlay"
+      data-testid="modal-overlay"
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000,
+      }}
+    >
+      <dialog open style={{ borderRadius: '5px' }}>
+        {children}
+      </dialog>
+    </div>
   );
 }

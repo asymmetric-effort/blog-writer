@@ -12,8 +12,15 @@ interface StatusBarProps {
   repo: string;
   /** Selected file name. */
   file: string;
+  /** True when the repository wizard is visible. */
+  wizardOpen: boolean;
 }
 
-export default function StatusBar({ repo, file }: StatusBarProps): JSX.Element {
-  return <div className="status-bar">{repo && `${repo} - ${file}`}</div>;
+export default function StatusBar({ repo, file, wizardOpen }: StatusBarProps): JSX.Element {
+  const text = wizardOpen
+    ? 'Open or create a blog content repository.'
+    : repo
+    ? `${repo} - ${file}`
+    : '';
+  return <div className="status-bar">{text}</div>;
 }
