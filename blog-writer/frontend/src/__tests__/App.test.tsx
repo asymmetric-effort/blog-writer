@@ -3,7 +3,18 @@
 /// <reference types="vitest" />
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
+
+vi.mock('../pages/RepoWizard', () => ({
+  __esModule: true,
+  default: ({ onOpen }: { onOpen: (p: string) => void }) => (
+    <button data-testid="open-repo" onClick={() => onOpen('/path/to/repo')}>
+      Open Repo
+    </button>
+  )
+}));
+
 import App from '../App';
 
 /**
@@ -15,6 +26,8 @@ describe('App', () => {
     svc.Recent.mockResolvedValue([]);
     svc.Open.mockResolvedValue(undefined);
     svc.Create.mockResolvedValue(undefined);
+    const tree = (window as any).go.services.TreeService;
+    tree.List.mockResolvedValue(['post.json']);
   });
 
   it('renders RepoWizard inside a modal dialog', () => {
@@ -29,8 +42,8 @@ describe('App', () => {
     await act(async () => {
       vi.runAllTimers();
     });
-    expect(screen.getByText('Open')).toBeInTheDocument();
     vi.useRealTimers();
+    expect(screen.getByTestId('open-repo')).toBeInTheDocument();
   });
 
     it('positions FileTree on the left with fixed width', () => {
@@ -96,5 +109,26 @@ describe('App', () => {
       color: 'rgb(255, 255, 255)'
     });
     expect((header as HTMLElement).style.borderBottom).toBe('');
+  });
+
+  it('closes RepoWizard and updates status bar, editor and file tree after opening a repo', async () => {
+    vi.useFakeTimers();
+    render(<App />);
+    await act(async () => {
+      vi.runAllTimers();
+    });
+    vi.useRealTimers();
+    const user = userEvent.setup();
+    const editor = document.querySelector('.ql-editor') as HTMLElement;
+    await user.type(editor, 'draft');
+    await act(async () => {
+      await user.click(screen.getByTestId('open-repo'));
+    });
+    const current = await screen.findByTestId('current-repo');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(current).toHaveTextContent('Repo: path/to/repo');
+    expect(current).toHaveTextContent('File: <none>');
+    expect(document.querySelector('.ql-editor')?.innerHTML).toBe('<p><br></p>');
+    expect(screen.getByText('post.json')).toBeInTheDocument();
   });
 });

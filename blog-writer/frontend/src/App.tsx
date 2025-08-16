@@ -30,6 +30,7 @@ export default function App(): JSX.Element {
 
   const handleOpen = (p: string) => {
     setRepo(p);
+    setFile('');
     setShowRepoWizard(false);
   };
 
@@ -39,7 +40,7 @@ export default function App(): JSX.Element {
         <div className="main-area" style={{ marginTop: 0 }}>
           <FileTree repo={repo} onSelect={setFile} />
           <div className="editor-container" style={editorStyle}>
-            <Editor />
+            <Editor repo={repo} file={file} />
           </div>
         </div>
         <StatusBar repo={repo} file={file} wizardOpen={showRepoWizard} />
