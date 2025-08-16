@@ -4,4 +4,8 @@ import {menu} from '../models';
 
 export function Greet(arg1:string):Promise<string>;
 
+export function ReportBug(arg1:menu.CallbackData):Promise<void>;
+
 export function ShowAbout(arg1:menu.CallbackData):Promise<void>;
+
+export function ShowDocs(arg1:menu.CallbackData):Promise<void>;
