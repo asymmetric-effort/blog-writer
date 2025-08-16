@@ -17,8 +17,15 @@ export default function App(): JSX.Element {
 
   return (
     <div id="App">
-      <MenuBar />
+      <div>
+        <MenuBar />
+      </div>
+      <div>
       <Editor />
+      </div>
+      <div>
+          /* The status bar goes here */
+      </div>
       <Modal open={showRepoWizard}>
         <RepoWizard />
       </Modal>
