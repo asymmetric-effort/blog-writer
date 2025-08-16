@@ -10,7 +10,14 @@ import 'react-quill/dist/quill.snow.css';
  */
 export const Editor: React.FC = () => {
   const [value, setValue] = useState<string>('');
-  return <ReactQuill theme="snow" value={value} onChange={setValue} style={{ height: '100%' }} />;
+  return (
+    <ReactQuill
+      theme="snow"
+      value={value}
+      onChange={setValue}
+      style={{ height: '100%', width: '100%' }}
+    />
+  );
 };
 
 export default Editor;

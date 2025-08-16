@@ -45,7 +45,7 @@ describe('App', () => {
       expect(treeStyle.flexShrink).toBe('0');
     });
 
-    it('allows the editor to grow and shrink with the window', () => {
+  it('allows the editor to grow and shrink with the window', () => {
       render(<App />);
       const editor = document.querySelector('.editor-container') as HTMLElement;
       const style = getComputedStyle(editor);
@@ -58,6 +58,13 @@ describe('App', () => {
     expect(screen.getByText('Open or create a blog content repository.')).toBeInTheDocument();
   });
 
+  it('expands the editor to the right edge', () => {
+    render(<App />);
+    const root = document.querySelector('.editor-container > div') as HTMLElement;
+    const style = getComputedStyle(root);
+    expect(style.width).toBe('100%');
+  });
+
   it('renders a centered modal logo', () => {
     render(<App />);
     const overlay = screen.getByTestId('modal-overlay');
@@ -67,5 +74,20 @@ describe('App', () => {
       justifyContent: 'center'
     });
     expect(screen.getByAltText('logo')).toBeInTheDocument();
+  });
+
+  it('styles the modal overlay and title bar', () => {
+    render(<App />);
+    const overlay = screen.getByTestId('modal-overlay');
+    expect(overlay).toHaveStyle({
+      position: 'fixed',
+      zIndex: '1000'
+    });
+    const header = screen.getByText('Repository Wizard');
+    expect(header).toHaveStyle({
+      backgroundColor: 'rgb(27, 38, 54)',
+      color: 'rgb(255, 255, 255)'
+    });
+    expect((header as HTMLElement).style.borderBottom).toBe('');
   });
 });

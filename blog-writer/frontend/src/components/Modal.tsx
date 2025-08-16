@@ -23,19 +23,10 @@ export default function Modal({ open, title, children }: ModalProps): JSX.Elemen
     <div
       className="modal-overlay"
       data-testid="modal-overlay"
-      style={dialogStyle}
+      style={overlayStyle}
     >
-      <dialog open style={{ borderRadius: '5px', padding: 0 }}>
-        <div
-          style={{
-            textAlign: 'center',
-            fontFamily: 'system-ui, sans-serif',
-            padding: '0.5rem',
-            borderBottom: '1px solid black',
-          }}
-        >
-          {title}
-        </div>
+      <dialog open style={dialogStyle}>
+        <div style={headerStyle}>{title}</div>
         {children}
       </dialog>
     </div>
@@ -43,10 +34,38 @@ export default function Modal({ open, title, children }: ModalProps): JSX.Elemen
 }
 
 /**
+ * overlayStyle positions and styles the translucent backdrop.
+ */
+const overlayStyle: React.CSSProperties = {
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  width: '100vw',
+  height: '100vh',
+  zIndex: 1000,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: 'rgba(0, 0, 0, 0.5)'
+};
+
+/**
  * dialogStyle defines the modal's visual appearance.
  */
 const dialogStyle: React.CSSProperties = {
   borderRadius: '5px',
+  padding: 0,
   border: '2px outset',
   boxShadow: '10px 10px 10px rgba(0,0,0,0.2)'
+};
+
+/**
+ * headerStyle matches the app window styling without a separating border.
+ */
+const headerStyle: React.CSSProperties = {
+  textAlign: 'center',
+  fontFamily: '"Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+  padding: '0.5rem',
+  backgroundColor: 'rgba(27, 38, 54, 1)',
+  color: 'white'
 };
