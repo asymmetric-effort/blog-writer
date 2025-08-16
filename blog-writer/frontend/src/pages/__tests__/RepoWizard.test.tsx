@@ -48,6 +48,13 @@ describe('RepoWizard', () => {
     expect(button.nextElementSibling).toBe(hint);
   });
 
+  it('adds 10px margin between repository and SSH inputs', () => {
+    render(<RepoWizard onOpen={vi.fn()} />);
+    fireEvent.click(screen.getByText('Create'));
+    const boxes = screen.getAllByRole('textbox');
+    expect(boxes[1]).toHaveStyle({ marginTop: '10px' });
+  });
+
   it('highlights tab on hover', () => {
     render(<RepoWizard onOpen={vi.fn()} />);
     const openTab = screen.getByText('Open');

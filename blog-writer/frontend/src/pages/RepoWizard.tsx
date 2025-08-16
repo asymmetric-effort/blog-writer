@@ -78,6 +78,8 @@ export default function RepoWizard({ onOpen }: RepoWizardProps) {
     cursor: 'pointer',
     margin: 0,
   };
+  const inputSpacing = 10;
+  const sshInputStyle: React.CSSProperties = { marginTop: `${inputSpacing}px` };
   const rows: RecentRepo[] = [...(recent ?? [])];
   while (rows.length < 5) rows.push({ path: '', lastOpened: '' } as RecentRepo);
   const gridRows = rows.map(r => [
@@ -145,6 +147,7 @@ export default function RepoWizard({ onOpen }: RepoWizardProps) {
             placeholder="SSH URL (optional)"
             value={remote}
             onChange={(e) => setRemote(e.target.value)}
+            style={sshInputStyle}
           />
           <button onClick={handleCreate}>Create</button>
           <p className="hint" style={{ marginTop: 'auto' }}>
