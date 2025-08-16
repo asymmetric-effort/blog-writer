@@ -2,14 +2,13 @@
 package main
 
 import (
-	"embed"
+  "embed"
 
-	"github.com/wailsapp/wails/v2"
-	"github.com/wailsapp/wails/v2/pkg/menu"
-	"github.com/wailsapp/wails/v2/pkg/options"
-	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+  "github.com/wailsapp/wails/v2/pkg/menu"
+  "github.com/wailsapp/wails/v2/pkg/options"
+  "github.com/wailsapp/wails/v2/pkg/options/assetserver"
 
-	"blog-writer/internal/services"
+  "blog-writer/internal/services"
 )
 
 //go:embed all:frontend/dist
@@ -30,7 +29,7 @@ func main() {
 	helpMenu.AddText("About", nil, app.ShowAbout)
 
 	// Create application with options.
-	err := wails.Run(&options.App{
+	err = wails.Run(&options.App{
 		Title:  "blog-writer",
 		Width:  1024,
 		Height: 768,
