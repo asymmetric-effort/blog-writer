@@ -57,11 +57,11 @@ describe('FileTree', () => {
     expect(style.paddingLeft).toBe('5px');
   });
 
-  it('aligns top edge with menu bar', () => {
+  it('positions root node 5px from top edge', () => {
     const { container } = render(<FileTree repo="" onSelect={() => {}} />);
     const list = container.querySelector('.file-tree') as HTMLElement;
     const style = getComputedStyle(list);
-    expect(style.marginTop).toBe('0px');
+    expect(style.paddingTop).toBe('5px');
   });
 
   it('uses the system background and a right border', () => {
