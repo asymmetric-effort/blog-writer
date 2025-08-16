@@ -36,7 +36,7 @@ export default function App(): JSX.Element {
   return (
       <div id="App" className="app-window">
         <MenuBar />
-        <div className="main-area">
+        <div className="main-area" style={{ marginTop: 0 }}>
           <FileTree repo={repo} onSelect={setFile} />
           <div className="editor-container" style={editorStyle}>
             <Editor />

@@ -3,7 +3,7 @@
 
 import React from 'react';
 import './StatusBar.css';
-import { normalizePath } from '../utils/normalizePath';
+import CurrentRepo from './CurrentRepo';
 
 /**
  * StatusBar displays the current repository and file being edited.
@@ -18,13 +18,6 @@ interface StatusBarProps {
 }
 
 export default function StatusBar({ repo, file, wizardOpen }: StatusBarProps): JSX.Element {
-  const repoPath = repo ? normalizePath(repo) : '';
-  const filePath = file ? normalizePath(file) : '';
-  const text = wizardOpen
-    ? 'Open or create a blog content repository.'
-    : repo
-    ? `${repoPath} - ${filePath}`
-    : '';
   const style: React.CSSProperties = {
     fontFamily:
       "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
@@ -35,7 +28,13 @@ export default function StatusBar({ repo, file, wizardOpen }: StatusBarProps): J
   };
   return (
     <div className="status-bar" style={style}>
-      {text}
+      {wizardOpen ? (
+        'Open or create a blog content repository.'
+      ) : repo ? (
+        <CurrentRepo repo={repo} file={file} />
+      ) : (
+        ''
+      )}
     </div>
   );
 }

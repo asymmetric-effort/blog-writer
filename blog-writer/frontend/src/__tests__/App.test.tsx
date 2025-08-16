@@ -45,6 +45,13 @@ describe('App', () => {
       expect(treeStyle.flexShrink).toBe('0');
     });
 
+  it('places FileTree flush below the menu bar', () => {
+      render(<App />);
+      const main = document.querySelector('.main-area') as HTMLElement;
+      const style = getComputedStyle(main);
+      expect(style.marginTop).toBe('0px');
+    });
+
   it('allows the editor to grow and shrink with the window', () => {
       render(<App />);
       const editor = document.querySelector('.editor-container') as HTMLElement;

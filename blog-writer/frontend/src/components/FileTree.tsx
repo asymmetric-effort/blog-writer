@@ -29,6 +29,8 @@ export default function FileTree({ repo, onSelect }: FileTreeProps): JSX.Element
     width: `${NAV_WIDTH}px`,
     flex: `0 0 ${NAV_WIDTH}px`,
     height: '100%',
+    paddingLeft: '5px',
+    marginTop: '0',
   };
   if (!repo) {
     return (

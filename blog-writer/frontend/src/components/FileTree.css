@@ -1,12 +1,12 @@
 /* Copyright (c) 2025 blog-writer authors */
 
-  .file-tree {
-    overflow-y: auto;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    height: 100%;
-  }
+.file-tree {
+  overflow-y: auto;
+  margin: 0;
+  padding: 0 0 0 5px;
+  list-style: none;
+  height: 100%;
+}
 .file-tree li button {
   display: block;
   width: 100%;
