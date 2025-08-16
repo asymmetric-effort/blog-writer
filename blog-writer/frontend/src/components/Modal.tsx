@@ -4,7 +4,9 @@
 import React from 'react';
 
 /**
- * Modal wraps content in a dialog element displayed above the main window.
+ * Modal wraps content in a dialog element displayed above the main window with a
+ * visual distinction including an outset border and a drop shadow offset by
+ * 10 pixels to the right and bottom.
  */
 interface ModalProps {
   /** True if the modal should be displayed. */
@@ -21,18 +23,7 @@ export default function Modal({ open, title, children }: ModalProps): JSX.Elemen
     <div
       className="modal-overlay"
       data-testid="modal-overlay"
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 1000,
-      }}
+      style={dialogStyle}
     >
       <dialog open style={{ borderRadius: '5px', padding: 0 }}>
         <div
@@ -45,8 +36,17 @@ export default function Modal({ open, title, children }: ModalProps): JSX.Elemen
         >
           {title}
         </div>
-        <div style={{ padding: '0.5rem' }}>{children}</div>
+        {children}
       </dialog>
     </div>
   );
 }
+
+/**
+ * dialogStyle defines the modal's visual appearance.
+ */
+const dialogStyle: React.CSSProperties = {
+  borderRadius: '5px',
+  border: '2px outset',
+  boxShadow: '10px 10px 10px rgba(0,0,0,0.2)'
+};
