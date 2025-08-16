@@ -3,7 +3,6 @@
 /// <reference types="vitest" />
 
 import { describe, it, expect } from 'vitest';
-import path from 'path';
 import { normalizePath } from '../normalizePath';
 
 /**
@@ -12,7 +11,11 @@ import { normalizePath } from '../normalizePath';
 describe('normalizePath', () => {
   it('converts mixed separators to host format', () => {
     const input = 'a/b\\c';
-    const expected = path.normalize(input);
+    const sep =
+      typeof navigator !== 'undefined' && /windows/i.test(navigator.userAgent)
+        ? '\\'
+        : '/';
+    const expected = ['a', 'b', 'c'].join(sep);
     expect(normalizePath(input)).toBe(expected);
   });
 });

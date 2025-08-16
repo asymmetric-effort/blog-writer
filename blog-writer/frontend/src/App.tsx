@@ -43,7 +43,7 @@ export default function App(): JSX.Element {
           </div>
         </div>
         <StatusBar repo={repo} file={file} wizardOpen={showRepoWizard} />
-        <Modal open={showRepoWizard}>
+        <Modal open={showRepoWizard} title="Repository Wizard">
           {showLogo ? <img src={logo} alt="logo" /> : <RepoWizard onOpen={handleOpen} />}
         </Modal>
       </div>
