@@ -2,32 +2,47 @@
 
 // SPDX-License-Identifier: MIT
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import Editor from './components/Editor';
 import RepoWizard from './pages/RepoWizard';
 import Modal from './components/Modal';
 import MenuBar from './components/MenuBar';
+import StatusBar from './components/StatusBar';
+import FileTree from './components/FileTree';
+import logo from './assets/images/logo-universal.png';
 
 /**
  * App renders the WYSIWYG editor with a modal repo wizard.
  */
 export default function App(): JSX.Element {
-  const [showRepoWizard] = useState(true);
+  const [showRepoWizard, setShowRepoWizard] = useState(true);
+  const [showLogo, setShowLogo] = useState(true);
+  const [repo, setRepo] = useState('');
+  const [file, setFile] = useState('');
+
+  useEffect(() => {
+    const t = setTimeout(() => setShowLogo(false), 15000);
+    return () => clearTimeout(t);
+  }, []);
+
+  const handleOpen = (p: string) => {
+    setRepo(p);
+    setShowRepoWizard(false);
+  };
 
   return (
-    <div id="App">
-      <div>
-        <MenuBar />
+    <div id="App" className="app-window">
+      <MenuBar />
+      <div className="main-area">
+        <FileTree repo={repo} onSelect={setFile} />
+        <div className="editor-container">
+          <Editor />
+        </div>
       </div>
-      <div>
-      <Editor />
-      </div>
-      <div>
-          /* The status bar goes here */
-      </div>
+      <StatusBar repo={repo} file={file} />
       <Modal open={showRepoWizard}>
-        <RepoWizard />
+        {showLogo ? <img src={logo} alt="logo" /> : <RepoWizard onOpen={handleOpen} />}
       </Modal>
     </div>
   );

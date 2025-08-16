@@ -1,6 +1,16 @@
-#app {
+#App.app-window {
     height: 100vh;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-area {
+    flex: 1;
+    display: flex;
+}
+
+.editor-container {
+    flex: 1;
 }
 
 #logo {

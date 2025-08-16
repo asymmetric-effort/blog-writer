@@ -1,0 +1,17 @@
+/* Copyright (c) 2025 blog-writer authors */
+
+.file-tree {
+  width: 200px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.file-tree li button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 4px;
+}
