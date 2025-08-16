@@ -74,10 +74,14 @@ export default function RepoWizard({ onOpen }: RepoWizardProps) {
     }
   };
 
+  const tabBorderColor = '#555';
   const tabStyle: React.CSSProperties = {
     flex: 1,
     padding: '0.5rem',
-    border: 'none',
+    borderTop: `1px outset ${tabBorderColor}`,
+    borderLeft: `1px outset ${tabBorderColor}`,
+    borderRight: `1px outset ${tabBorderColor}`,
+    borderBottom: '1px solid black',
     borderTopLeftRadius: '5px',
     borderTopRightRadius: '5px',
     cursor: 'pointer',
