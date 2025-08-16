@@ -5,56 +5,47 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { fireEvent, render, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import DirectoryPicker from '../DirectoryPicker';
+import * as DirSvc from '../../../wailsjs/go/services/DirectoryService';
 
-/**
- * Basic interaction test ensuring DirectoryPicker returns a directory path.
- */
+vi.mock('../../../wailsjs/go/services/DirectoryService');
+
+/** Tests for the DirectoryPicker component. */
 describe('DirectoryPicker', () => {
   afterEach(() => {
-    delete (window as any).runtime;
-    delete (window as any).showDirectoryPicker;
-  });
-  it('returns path when showDirectoryPicker provides one', async () => {
-    const onChange = vi.fn();
-    (window as any).showDirectoryPicker = vi.fn().mockResolvedValue('/tmp/repo');
-    const { getByRole } = render(<DirectoryPicker onChange={onChange} />);
-    fireEvent.click(getByRole('button'));
-    await waitFor(() => expect(onChange).toHaveBeenCalledWith('/tmp/repo'));
-  });
-  it('invokes onChange with selected path', () => {
-    const onChange = vi.fn();
-    const { container } = render(<DirectoryPicker onChange={onChange} />);
-    const input = container.querySelector('input') as HTMLInputElement;
-    const file = new File(['content'], '/tmp/test/a.txt');
-    Object.defineProperty(file, 'path', { value: '/tmp/test/a.txt' });
-    fireEvent.change(input, { target: { files: [file] } });
-    expect(onChange).toHaveBeenCalledWith('/tmp/test');
+    vi.resetAllMocks();
   });
 
-  it('handles Windows-style paths', () => {
-    const onChange = vi.fn();
-    const { container } = render(<DirectoryPicker onChange={onChange} />);
-    const input = container.querySelector('input') as HTMLInputElement;
-    const file = new File(['content'], 'C:\\Users\\Alice\\repo\\a.txt');
-    Object.defineProperty(file, 'path', { value: 'C:\\Users\\Alice\\repo\\a.txt' });
-    fireEvent.change(input, { target: { files: [file] } });
-    expect(onChange).toHaveBeenCalledWith('C:\\Users\\Alice\\repo');
-  });
-
-  it('resolves file path via Wails runtime when missing', () => {
-    const onChange = vi.fn();
-    const resolve = vi.fn((files: File[]) => {
-      Object.defineProperty(files[0], 'path', { value: '/tmp/test/a.txt', configurable: true });
+  it('lists directories and selects path', async () => {
+    (DirSvc.List as any).mockImplementation((p: string) => {
+      if (!p) return Promise.resolve(['/home/user/a', '/home/user/b']);
+      if (p === '/home/user/a') return Promise.resolve(['/home/user/a/sub']);
+      return Promise.resolve([]);
     });
-    (window as any).runtime = {
-      CanResolveFilePaths: () => true,
-      ResolveFilePaths: resolve,
-    };
-    const { container } = render(<DirectoryPicker onChange={onChange} />);
-    const input = container.querySelector('input') as HTMLInputElement;
-    const file = new File(['content'], 'a.txt');
-    fireEvent.change(input, { target: { files: [file] } });
-    expect(resolve).toHaveBeenCalled();
-    expect(onChange).toHaveBeenCalledWith('/tmp/test');
+    const onChange = vi.fn();
+    const { getByRole, getAllByTestId, getByText } = render(<DirectoryPicker onChange={onChange} />);
+    fireEvent.click(getByRole('button', { name: /browse/i }));
+    await waitFor(() => expect(DirSvc.List).toHaveBeenCalled());
+    const items = getAllByTestId('dir-item');
+    fireEvent.click(items[0]);
+    await waitFor(() => expect(DirSvc.List).toHaveBeenLastCalledWith('/home/user/a'));
+    fireEvent.click(getByText('Select'));
+    expect(onChange).toHaveBeenCalledWith('/home/user/a');
+  });
+
+  it('creates new directory', async () => {
+    (DirSvc.List as any).mockImplementation((p: string) => {
+      if (!p) return Promise.resolve(['/tmp/sub']);
+      return Promise.resolve([]);
+    });
+    const onChange = vi.fn();
+    const { getByRole, getByPlaceholderText, getByTestId } = render(<DirectoryPicker onChange={onChange} />);
+    fireEvent.click(getByRole('button', { name: /browse/i }));
+    await waitFor(() => expect(DirSvc.List).toHaveBeenCalled());
+    (DirSvc.Create as any).mockResolvedValue(undefined);
+    const input = getByPlaceholderText('New Directory');
+    fireEvent.change(input, { target: { value: 'foo' } });
+    fireEvent.click(getByTestId('create-btn'));
+    await waitFor(() => expect(DirSvc.Create).toHaveBeenCalledWith('/tmp', 'foo'));
   });
 });
+

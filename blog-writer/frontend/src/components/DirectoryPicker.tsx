@@ -1,92 +1,120 @@
 // Copyright (c) 2025 blog-writer authors
 // SPDX-License-Identifier: MIT
 
-import React, { useCallback, useRef } from 'react';
-import { CanResolveFilePaths, ResolveFilePaths } from '../../wailsjs/runtime/runtime';
+import React, { useEffect, useState } from 'react';
+import { Create, List } from '../../wailsjs/go/services/DirectoryService';
 
-/**
- * DirectoryPicker renders a directory selector used by RepoWizard forms.
- *
- * It prefers the File System Access API when available and falls back to a
- * hidden `<input type="file" webkitdirectory>` element otherwise. The
- * resulting dialog allows users to create new directories and the selected
- * directory path is returned via the `onChange` callback.
- */
+/** Props for DirectoryPicker component. */
 interface DirectoryPickerProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onChange'> {
-  /** Callback invoked with the selected path. */
+  /** Called with the chosen directory path. */
   onChange: (path: string) => void;
 }
 
-export default function DirectoryPicker({ onChange, ...rest }: DirectoryPickerProps): JSX.Element {
-  const inputRef = useRef<HTMLInputElement>(null);
+/** Modal dialog allowing navigation and selection of directories. */
+function DirectoryModal({ onSelect, onClose }: { onSelect: (p: string) => void; onClose: () => void; }) {
+  const [path, setPath] = useState('');
+  const [dirs, setDirs] = useState<string[]>([]);
+  const [newName, setNewName] = useState('');
 
-  /**
-   * Triggers directory selection using File System Access API or the fallback
-   * file input when unsupported. Some environments (e.g., Wails) return a
-   * string path instead of a directory handle; this function normalizes the
-   * result and falls back to the hidden input if a path cannot be determined.
-   */
-  const handleClick = useCallback(async () => {
+  const parentDir = (p: string): string => {
+    const parts = p.split(/[/\\]/);
+    parts.pop();
+    return parts.join(p.includes('\\') ? '\\' : '/');
+  };
+
+  const baseName = (p: string): string => {
+    const parts = p.split(/[/\\]/);
+    return parts[parts.length - 1];
+  };
+
+  const load = async (p: string) => {
+    const list = await List(p);
+    setDirs(list);
+    if (p === '' && list.length > 0) {
+      setPath(parentDir(list[0]));
+    } else if (p !== '') {
+      setPath(p);
+    }
+  };
+
+  useEffect(() => {
+    load('');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const navigate = (d: string) => {
+    load(d);
+  };
+
+  const goUp = () => {
+    if (path) {
+      const parent = parentDir(path);
+      load(parent);
+    }
+  };
+
+  const handleCreate = async () => {
+    if (!newName) return;
     try {
-      // @ts-ignore - showDirectoryPicker is not yet in TypeScript lib.dom
-      if (window.showDirectoryPicker) {
-        // @ts-ignore
-        const handle = await window.showDirectoryPicker();
-        if (typeof handle === 'string') {
-          onChange(handle);
-          return;
-        }
-        const path = (handle as any).path || (handle as any).name;
-        if (path) {
-          onChange(path);
-          return;
-        }
-      }
+      await Create(path, newName);
+      setNewName('');
+      await load(path);
     } catch {
-      // Ignore and fall back to the hidden input below.
+      // ignore errors; validation handled server-side
     }
-    inputRef.current?.click();
-  }, [onChange]);
-
-  /**
-   * Extracts the directory path from the chosen file when using the fallback
-   * input element. Handles both POSIX and Windows path separators.
-   */
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      try {
-        if (CanResolveFilePaths()) {
-          ResolveFilePaths(Array.from(files));
-        }
-      } catch {
-        // runtime not available; continue without resolving
-      }
-      const file = files[0] as File & { path?: string };
-      const fullPath = file.path || '';
-      if (fullPath) {
-        const separator = fullPath.includes('/') ? '/' : '\\';
-        const dir = fullPath.substring(0, fullPath.lastIndexOf(separator));
-        onChange(dir);
-      }
-    }
-  }, [onChange]);
+  };
 
   return (
+    <div role="dialog" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.3)' }}>
+      <div style={{ background: 'white', padding: '1rem', maxWidth: '400px', margin: '10% auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span data-testid="current-path">{path}</span>
+          <button onClick={goUp}>Up</button>
+        </div>
+        <ul>
+          {dirs.map((d) => (
+            <li key={d}>
+              <button onClick={() => navigate(d)} data-testid="dir-item">
+                {baseName(d)}
+              </button>
+            </li>
+          ))}
+        </ul>
+        <div>
+          <input
+            placeholder="New Directory"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+          />
+          <button onClick={handleCreate} data-testid="create-btn">Create</button>
+        </div>
+        <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+          <button onClick={() => { onSelect(path); }}>Select</button>
+          <button onClick={onClose}>Cancel</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** DirectoryPicker renders a button that opens DirectoryModal. */
+export default function DirectoryPicker({ onChange, ...rest }: DirectoryPickerProps): JSX.Element {
+  const [open, setOpen] = useState(false);
+  return (
     <>
-      <button type="button" onClick={handleClick} {...rest}>
+      <button type="button" onClick={() => setOpen(true)} {...rest}>
         Browse…
       </button>
-      <input
-        ref={inputRef}
-        type="file"
-        // @ts-ignore -- non-standard attributes widely supported
-        webkitdirectory=""
-        // @ts-ignore
-        directory=""
-        style={{ display: 'none' }}
-        onChange={handleInputChange}
-      />
+      {open && (
+        <DirectoryModal
+          onSelect={(p) => {
+            onChange(p);
+            setOpen(false);
+          }}
+          onClose={() => setOpen(false)}
+        />
+      )}
     </>
   );
 }
+
