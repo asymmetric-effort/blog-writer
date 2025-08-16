@@ -1,8 +1,13 @@
 // Copyright (c) 2024 blog-writer authors
 import { useEffect, useState } from 'react';
-import { Create, Open, Recent, type RecentRepo } from '../../wailsjs/go/services/RepoService';
+import { Create, Open, Recent } from '../../wailsjs/go/services/RepoService';
 import PathPicker from '../components/PathPicker';
 import './RepoWizard.css';
+
+interface RecentRepo {
+  path: string;
+  lastOpened: string;
+}
 
 /**
  * RepoWizard presents options to open or create repositories and choose from recent ones.
