@@ -15,19 +15,19 @@ describe('DirectoryPicker', () => {
     vi.resetAllMocks();
   });
 
-  it('lists directories and selects path', async () => {
+  it('lists directories as tree and selects path', async () => {
     (DirSvc.List as any).mockImplementation((p: string) => {
       if (!p) return Promise.resolve(['/home/user/a', '/home/user/b']);
       if (p === '/home/user/a') return Promise.resolve(['/home/user/a/sub']);
       return Promise.resolve([]);
     });
     const onChange = vi.fn();
-    const { getByRole, getAllByTestId, getByText } = render(<DirectoryPicker onChange={onChange} />);
+    const { getByRole, getByText } = render(<DirectoryPicker onChange={onChange} />);
     fireEvent.click(getByRole('button', { name: /browse/i }));
-    await waitFor(() => expect(DirSvc.List).toHaveBeenCalled());
-    const items = getAllByTestId('dir-item');
-    fireEvent.click(items[0]);
-    await waitFor(() => expect(DirSvc.List).toHaveBeenLastCalledWith('/home/user/a'));
+    await waitFor(() => expect(DirSvc.List).toHaveBeenCalledWith(''));
+    await waitFor(() => expect(DirSvc.List).toHaveBeenCalledWith('/home/user/a'));
+    expect(getByText('sub')).toBeInTheDocument();
+    fireEvent.click(getByText('a'));
     fireEvent.click(getByText('Select'));
     expect(onChange).toHaveBeenCalledWith('/home/user/a');
   });
@@ -53,6 +53,13 @@ describe('DirectoryPicker', () => {
     const { getByRole } = render(<DirectoryPicker onChange={onChange} />);
     const button = getByRole('button', { name: /browse/i });
     expect(button).toHaveStyle({ borderRadius: '5px', borderStyle: 'outset' });
+
+    it('limits tree height and enables scrolling', async () => {
+    (DirSvc.List as any).mockResolvedValue([]);
+    const { getByRole, getByTestId } = render(<DirectoryPicker onChange={() => {}} />);
+    fireEvent.click(getByRole('button', { name: /browse/i }));
+    const container = await waitFor(() => getByTestId('tree-container'));
+    expect(container).toHaveStyle({ maxHeight: '500px', overflowY: 'auto' });
   });
 });
 

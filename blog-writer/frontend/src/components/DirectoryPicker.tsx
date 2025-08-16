@@ -3,6 +3,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Create, List } from '../../wailsjs/go/services/DirectoryService';
+import DirectoryTree, { DirNode } from './DirectoryTree';
 
 /** Props for DirectoryPicker component. */
 interface DirectoryPickerProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onChange'> {
@@ -13,7 +14,7 @@ interface DirectoryPickerProps extends Omit<React.ButtonHTMLAttributes<HTMLButto
 /** Modal dialog allowing navigation and selection of directories. */
 function DirectoryModal({ onSelect, onClose }: { onSelect: (p: string) => void; onClose: () => void; }) {
   const [path, setPath] = useState('');
-  const [dirs, setDirs] = useState<string[]>([]);
+  const [tree, setTree] = useState<DirNode[]>([]);
   const [newName, setNewName] = useState('');
 
   const parentDir = (p: string): string => {
@@ -27,38 +28,43 @@ function DirectoryModal({ onSelect, onClose }: { onSelect: (p: string) => void; 
     return parts[parts.length - 1];
   };
 
-  const load = async (p: string) => {
-    const list = await List(p);
-    setDirs(list);
-    if (p === '' && list.length > 0) {
-      setPath(parentDir(list[0]));
-    } else if (p !== '') {
-      setPath(p);
+  /**
+   * buildTree recursively constructs a directory tree rooted at p while preventing cycles.
+   */
+  const buildTree = async (p: string, visited: Set<string>): Promise<DirNode> => {
+    if (visited.has(p)) return { path: p, name: baseName(p), children: [] };
+    visited.add(p);
+    let children: DirNode[] = [];
+    try {
+      const list = await List(p);
+      children = await Promise.all(list.map((d) => buildTree(d, visited)));
+    } catch {
+      children = [];
     }
+    return { path: p, name: baseName(p) || p, children };
+  };
+
+  /** loadTree initializes the directory tree from the user's home directory. */
+  const loadTree = async () => {
+    const list = await List('');
+    const rootPath = list.length > 0 ? parentDir(list[0]) : '';
+    const visited = new Set<string>();
+    const nodes = await Promise.all(list.map((d) => buildTree(d, visited)));
+    setPath(rootPath);
+    setTree(nodes);
   };
 
   useEffect(() => {
-    load('');
+    loadTree();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const navigate = (d: string) => {
-    load(d);
-  };
-
-  const goUp = () => {
-    if (path) {
-      const parent = parentDir(path);
-      load(parent);
-    }
-  };
 
   const handleCreate = async () => {
     if (!newName) return;
     try {
       await Create(path, newName);
       setNewName('');
-      await load(path);
+      await loadTree();
     } catch {
       // ignore errors; validation handled server-side
     }
@@ -69,17 +75,10 @@ function DirectoryModal({ onSelect, onClose }: { onSelect: (p: string) => void; 
       <div style={{ background: 'white', padding: '1rem', maxWidth: '400px', margin: '10% auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span data-testid="current-path">{path}</span>
-          <button onClick={goUp}>Up</button>
         </div>
-        <ul>
-          {dirs.map((d) => (
-            <li key={d}>
-              <button onClick={() => navigate(d)} data-testid="dir-item">
-                {baseName(d)}
-              </button>
-            </li>
-          ))}
-        </ul>
+        <div data-testid="tree-container" style={{ maxHeight: '500px', overflowY: 'auto' }}>
+          <DirectoryTree nodes={tree} selected={path} onSelect={setPath} />
+        </div>
         <div>
           <input
             placeholder="New Directory"
