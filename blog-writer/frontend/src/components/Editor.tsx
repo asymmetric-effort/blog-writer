@@ -6,6 +6,11 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
 /**
+ * Disable the default Quill toolbar since controls live in MenuBar.
+ */
+const quillModules = { toolbar: false };
+
+/**
  * Editor provides a basic React Quill WYSIWYG editor for authoring blog content.
  */
 export const Editor: React.FC = () => {
@@ -15,6 +20,7 @@ export const Editor: React.FC = () => {
       theme="snow"
       value={value}
       onChange={setValue}
+      modules={quillModules}
       style={{ height: '100%', width: '100%' }}
     />
   );
