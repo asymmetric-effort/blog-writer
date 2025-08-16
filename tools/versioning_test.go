@@ -11,15 +11,17 @@ import (
 	"testing"
 )
 
-// runTool executes the versioning script with the given arguments inside dir.
+// runTool executes the Go versioning CLI targeting the VERSION file in dir.
 func runTool(t *testing.T, dir string, args ...string) (string, int) {
 	t.Helper()
-	script, err := filepath.Abs("versioning")
+	toolDir, err := filepath.Abs("cmd/versioning")
 	if err != nil {
-		t.Fatalf("cannot resolve script path: %v", err)
+		t.Fatalf("cannot resolve tool path: %v", err)
 	}
-	cmd := exec.Command("python3", append([]string{script}, args...)...)
-	cmd.Dir = dir
+	versionFile := filepath.Join(dir, "VERSION")
+	cmdArgs := append([]string{"run", toolDir, "-file", versionFile}, args...)
+	cmd := exec.Command("go", cmdArgs...)
+	cmd.Dir = filepath.Dir(toolDir)
 	out, err := cmd.CombinedOutput()
 	exitCode := 0
 	if err != nil {
