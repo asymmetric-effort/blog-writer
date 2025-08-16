@@ -28,4 +28,11 @@ describe('StatusBar', () => {
     expect(styles.fontFamily.toLowerCase()).toContain('system-ui');
     expect(styles.backgroundColor).not.toBe('');
   });
+
+  it('renders an outset top border', () => {
+    const { container } = render(<StatusBar repo="" file="" wizardOpen={false} />);
+    const bar = container.querySelector('.status-bar') as HTMLElement;
+    const styles = getComputedStyle(bar);
+    expect(styles.borderTopStyle).toBe('outset');
+  });
 });

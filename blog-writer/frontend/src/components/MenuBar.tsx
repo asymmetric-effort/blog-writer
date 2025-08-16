@@ -45,12 +45,16 @@ export function MenuBar(): JSX.Element {
   const [helpOpen, setHelpOpen] = useState(false);
   const [dialog, setDialog] = useState<'about' | 'docs' | 'bug' | null>(null);
 
+  const style: React.CSSProperties = {
+    borderBottom: '1px outset',
+  };
+
   const openAbout = () => { setDialog('about'); setHelpOpen(false); };
   const openDocs = () => { setDialog('docs'); setHelpOpen(false); };
   const openBug = () => { setDialog('bug'); setHelpOpen(false); };
 
   return (
-    <div className="menu-bar">
+    <div className="menu-bar" style={style}>
       {actions.map(action => (
         <button
           key={action.label}

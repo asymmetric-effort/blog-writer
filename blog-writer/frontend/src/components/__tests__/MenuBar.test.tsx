@@ -51,4 +51,11 @@ describe('MenuBar', () => {
     expect(helpButton).not.toHaveTextContent('Help');
     expect(screen.getByTestId('help-icon')).toBeInTheDocument();
   });
+
+  it('renders an outset bottom border', () => {
+    const { container } = render(<MenuBar />);
+    const bar = container.querySelector('.menu-bar') as HTMLElement;
+    const styles = getComputedStyle(bar);
+    expect(styles.borderBottomStyle).toBe('outset');
+  });
 });

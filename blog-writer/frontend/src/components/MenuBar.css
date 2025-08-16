@@ -5,7 +5,7 @@
   gap: 0.5rem;
   padding: 0.25rem;
   background-color: #f0f0f0;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px outset;
 }
 
 .menu-button {
