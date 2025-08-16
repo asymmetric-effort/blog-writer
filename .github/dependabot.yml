@@ -1,0 +1,17 @@
+# Copyright (c) 2025 Asymmetric Effort, LLC.
+# Dependabot configuration for blog-writer repository.
+
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "gomod"
+    directory: "/blog-writer"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "npm"
+    directory: "/blog-writer/frontend"
+    schedule:
+      interval: "weekly"
