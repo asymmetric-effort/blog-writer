@@ -11,7 +11,7 @@ import Modal from '../components/Modal';
  */
 describe('Modal', () => {
   it('applies an outset border and 10px offset shadow', () => {
-    render(<Modal open>content</Modal>);
+    render(<Modal open title={"title"}>content</Modal>);
     const dialog = screen.getByRole('dialog');
     expect(dialog.style.borderStyle).toBe('outset');
     expect(dialog.style.boxShadow.startsWith('10px 10px')).toBe(true);
