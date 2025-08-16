@@ -62,6 +62,7 @@ describe('FileTree', () => {
     const list = container.querySelector('.file-tree') as HTMLElement;
     const style = getComputedStyle(list);
     expect(style.marginTop).toBe('0px');
+  });
 
   it('uses the system background and a right border', () => {
     const cssPath = join(dirname(fileURLToPath(import.meta.url)), '../FileTree.css');
@@ -71,6 +72,5 @@ describe('FileTree', () => {
     const { container } = render(<FileTree repo="" onSelect={() => {}} />);
     const list = container.querySelector('.file-tree') as HTMLElement;
     expect(list).toBeInTheDocument();
-
   });
 });

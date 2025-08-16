@@ -27,7 +27,7 @@ export default function RepoWizard({ onOpen }: RepoWizardProps) {
   const [remote, setRemote] = useState('');
 
   useEffect(() => {
-    Recent().then(setRecent);
+    Recent().then((r) => setRecent(r ?? []));
   }, []);
 
   const handleExisting = async (p: string) => {
@@ -50,7 +50,8 @@ export default function RepoWizard({ onOpen }: RepoWizardProps) {
     if (parentDir && repoName) {
       const full = `${parentDir}/${repoName}`;
       await Create(remote, full);
-      setRecent(await Recent());
+      const latest = await Recent();
+      setRecent(latest ?? []);
       onOpen(full);
     }
   };
@@ -77,7 +78,7 @@ export default function RepoWizard({ onOpen }: RepoWizardProps) {
     cursor: 'pointer',
     margin: 0,
   };
-  const rows: RecentRepo[] = [...recent];
+  const rows: RecentRepo[] = [...(recent ?? [])];
   while (rows.length < 5) rows.push({ path: '', lastOpened: '' } as RecentRepo);
   const gridRows = rows.map(r => [
     r.path,
