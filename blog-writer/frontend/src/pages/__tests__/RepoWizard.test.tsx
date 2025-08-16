@@ -92,4 +92,12 @@ describe('RepoWizard', () => {
       expect(cells[1].textContent).toBe('\u00A0');
     }
   });
+  it('uses Grid component with styled borders for recent repositories', async () => {
+    render(<RepoWizard onOpen={vi.fn()} />);
+    const grid = await screen.findByTestId('recent-grid');
+    expect(grid).toHaveStyle({ borderStyle: 'outset', borderRadius: '5px' });
+    const headers = grid.querySelectorAll('th');
+    const width = (headers[0] as HTMLElement).style.width;
+    headers.forEach(h => expect((h as HTMLElement).style.width).toBe(width));
+  });
 });

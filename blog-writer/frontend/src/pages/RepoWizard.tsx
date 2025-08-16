@@ -1,7 +1,8 @@
-// Copyright (c) 2024 blog-writer authors
+// Copyright (c) 2025 blog-writer authors
 import { useEffect, useState } from 'react';
 import { Create, Open, Recent } from '../../wailsjs/go/services/RepoService';
 import PathPicker from '../components/PathPicker';
+import Grid from '../components/Grid';
 import './RepoWizard.css';
 
 interface RecentRepo {
@@ -15,17 +16,6 @@ interface RecentRepo {
 interface RepoWizardProps {
   /** Callback when a repository has been opened. */
   onOpen: (path: string) => void;
-}
-
-/**
- * Render table cell text, using a non-breaking space to maintain row height
- * when the value is blank.
- *
- * @param value - Text content for a table cell.
- * @returns The provided value or a non-breaking space if empty.
- */
-function cellText(value: string): string {
-  return value || '\u00A0';
 }
 
 export default function RepoWizard({ onOpen }: RepoWizardProps) {
@@ -85,6 +75,10 @@ export default function RepoWizard({ onOpen }: RepoWizardProps) {
   };
   const rows: RecentRepo[] = [...recent];
   while (rows.length < 5) rows.push({ path: '', lastOpened: '' } as RecentRepo);
+  const gridRows = rows.map(r => [
+    r.path,
+    r.lastOpened ? new Date(r.lastOpened).toLocaleString() : '',
+  ]);
 
   return (
     <div className="repo-wizard" data-testid="repo-wizard" style={{ width: '400px', height: '300px' }}>
@@ -115,30 +109,16 @@ export default function RepoWizard({ onOpen }: RepoWizardProps) {
             data-testid="path-picker"
             style={{ height: '25px', marginTop: '20px' }}
           />
-          <table>
-            <thead>
-              <tr>
-                <th>Path</th>
-                <th>Last Opened</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r, i) => (
-                <tr
-                  key={i}
-                  data-testid="recent-row"
-                  onDoubleClick={r.path ? () => openRecent(r.path) : undefined}
-                >
-                  <td>{cellText(r.path)}</td>
-                  <td>
-                    {cellText(
-                      r.lastOpened ? new Date(r.lastOpened).toLocaleString() : ''
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <Grid
+            headers={['Path', 'Last Opened']}
+            rows={gridRows}
+            dataTestId="recent-grid"
+            rowTestId="recent-row"
+            onRowDoubleClick={(i) => {
+              const r = rows[i];
+              if (r.path) openRecent(r.path);
+            }}
+          />
           <p className="hint" style={{ marginTop: 'auto' }}>
             Select or create a repository to begin.
           </p>
