@@ -57,4 +57,11 @@ describe('App', () => {
     render(<App />);
     expect(screen.getByText('Open or create a blog content repository.')).toBeInTheDocument();
   });
+
+  it('renders a centered modal title', () => {
+    render(<App />);
+    const title = screen.getByText('Open/Create Blog Content Repository');
+    expect(title).toBeInTheDocument();
+    expect(title).toHaveStyle({ textAlign: 'center' });
+  });
 });

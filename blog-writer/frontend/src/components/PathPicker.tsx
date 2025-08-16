@@ -6,12 +6,12 @@ import React from 'react';
 /**
  * PathPicker renders a directory selector used by RepoWizard forms.
  */
-interface PathPickerProps {
+interface PathPickerProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
   /** Callback invoked with the selected path. */
   onChange: (path: string) => void;
 }
 
-export default function PathPicker({ onChange }: PathPickerProps): JSX.Element {
+export default function PathPicker({ onChange, ...rest }: PathPickerProps): JSX.Element {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
@@ -23,5 +23,5 @@ export default function PathPicker({ onChange }: PathPickerProps): JSX.Element {
     }
   };
 
-  return <input type="file" webkitdirectory="" onChange={handleChange} />;
+  return <input type="file" webkitdirectory="" onChange={handleChange} {...rest} />;
 }
