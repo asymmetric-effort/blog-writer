@@ -16,7 +16,7 @@ interface ModalProps {
 export default function Modal({ open, children }: ModalProps): JSX.Element | null {
   if (!open) return null;
   return (
-    <dialog open>
+    <dialog open style={{ borderRadius: '5px' }}>
       {children}
     </dialog>
   );

@@ -5,4 +5,9 @@ export function Create(arg1:string,arg2:string):Promise<void>;
 
 export function Open(arg1:string):Promise<void>;
 
-export function Recent():Promise<Array<string>>;
+export interface RecentRepo {
+  path: string;
+  lastOpened: string;
+}
+
+export function Recent():Promise<Array<RecentRepo>>;

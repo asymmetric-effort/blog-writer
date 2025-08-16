@@ -1,0 +1,25 @@
+/* Copyright (c) 2025 blog-writer authors */
+.tabs {
+  display: flex;
+}
+.tabs button {
+  flex: 1;
+  padding: 0.5rem;
+  border: none;
+  cursor: pointer;
+}
+.tabs .inactive {
+  background-color: #ccc;
+}
+.tabs .active {
+  background-color: #eee;
+}
+.open-tab table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.open-tab th,
+.open-tab td {
+  border: 1px solid #888;
+  padding: 0.25rem;
+}
