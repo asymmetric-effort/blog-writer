@@ -24,6 +24,7 @@ export default function StatusBar({ repo, file, wizardOpen }: StatusBarProps): J
     background: 'Canvas',
     color: 'CanvasText',
     colorScheme: 'light dark',
+    borderTop: '1px outset',
     width: '100%',
   };
   return (
