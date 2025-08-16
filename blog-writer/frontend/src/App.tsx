@@ -1,23 +1,33 @@
 // Copyright (c) 2025 Sam Caldwell
-// SPDX-License-Identifier: MIT
-
-import React from 'react';
+import { useState } from 'react';
+import logo from './assets/images/logo-universal.png';
 import './App.css';
-import Editor from './components/Editor';
-import RepoWizard from './pages/RepoWizard';
+import { Greet } from '../wailsjs/go/main/App';
+import MenuBar from './components/MenuBar';
 
 /**
- * App renders the WYSIWYG editor once a repository is opened or created.
+ * Main application component renders the greeting sample and the menu bar.
  */
-function App(): JSX.Element {
-  return (
-    <div id="App">
-      <div>
-        <Editor />
-      </div>
-      <div>
-        <RepoWizard/>
-      </div>
-    </div>
-  );
+function App() {
+    const [resultText, setResultText] = useState('Please enter your name below 👇');
+    const [name, setName] = useState('');
+    const updateName = (e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value);
+    const updateResultText = (result: string) => setResultText(result);
+
+    function greet() {
+        Greet(name).then(updateResultText);
+    }
+
+    return (
+        <div id="App">
+            <MenuBar />
+            <img src={logo} id="logo" alt="logo" />
+            <div id="result" className="result">{resultText}</div>
+            <div id="input" className="input-box">
+                <input id="name" className="input" onChange={updateName} autoComplete="off" name="input" type="text" />
+                <button className="btn" onClick={greet}>Greet</button>
+            </div>
+        </div>
+    );
+}
 export default App;
