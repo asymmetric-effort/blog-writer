@@ -80,11 +80,16 @@ describe('RepoWizard', () => {
     expect(hintCreate.parentElement?.lastElementChild).toBe(hintCreate);
   });
 
-  it('renders five recent placeholders when empty', async () => {
+  it('renders five placeholders with consistent height when empty', async () => {
     const svc = (window as any).go.services.RepoService;
     svc.Recent.mockResolvedValue([]);
     render(<RepoWizard onOpen={vi.fn()} />);
     const rows = await screen.findAllByTestId('recent-row');
     expect(rows).toHaveLength(5);
+    for (const row of rows) {
+      const cells = row.querySelectorAll('td');
+      expect(cells[0].textContent).toBe('\u00A0');
+      expect(cells[1].textContent).toBe('\u00A0');
+    }
   });
 });
