@@ -3,6 +3,7 @@
 /// <reference types="vitest" />
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
+import path from 'path';
 import '@testing-library/jest-dom/vitest';
 import StatusBar from '../StatusBar';
 
@@ -10,8 +11,16 @@ import StatusBar from '../StatusBar';
  * Render tests for StatusBar component.
  */
 describe('StatusBar', () => {
-  it('shows repository and file info', () => {
-    render(<StatusBar repo="/repo" file="file.txt" />);
-    expect(screen.getByText('/repo - file.txt')).toBeInTheDocument();
+  it('shows repository and file info using host path separators', () => {
+    const repo = 'one/two\\three';
+    const file = 'sub\\file.txt';
+    const expected = `${path.normalize(repo)} - ${path.normalize(file)}`;
+    render(<StatusBar repo={repo} file={file} wizardOpen={false} />);
+    expect(screen.getByText(expected)).toBeInTheDocument();
+  });
+
+  it('shows repo wizard hint when open', () => {
+    render(<StatusBar repo="" file="" wizardOpen />);
+    expect(screen.getByText('Open or create a blog content repository.')).toBeInTheDocument();
   });
 });

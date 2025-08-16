@@ -1,3 +1,5 @@
+/* Copyright (c) 2025 blog-writer authors */
+/* SPDX-License-Identifier: MIT */
 #App.app-window {
     height: 100vh;
     display: flex;
@@ -11,6 +13,16 @@
 
 .editor-container {
     flex: 1;
+    display: flex;
+}
+
+.editor-container .ql-container {
+    flex: 1;
+    height: 100%;
+}
+
+.editor-container .ql-editor {
+    height: 100%;
 }
 
 #logo {
