@@ -10,15 +10,22 @@ import Editor from '../Editor';
  * Render tests for the WYSIWYG editor.
  */
 describe('Editor', () => {
-  it('renders a textbox for content editing', () => {
+  it('renders an editable content area', () => {
     render(<Editor />);
-    const textbox = screen.getByRole('textbox');
-    expect(textbox).toBeInTheDocument();
+    const editor = document.querySelector('.ql-editor') as HTMLElement;
+    expect(editor).toBeInTheDocument();
+    expect(editor.getAttribute('contenteditable')).toBe('true');
   });
 
   it('stretches to full height', () => {
     render(<Editor />);
     const wrapper = document.querySelector('.ql-container')?.parentElement as HTMLElement;
     expect(wrapper).toHaveStyle({ height: '100%' });
+  });
+
+  it('does not render a toolbar', () => {
+    render(<Editor />);
+    const toolbar = document.querySelector('.ql-toolbar');
+    expect(toolbar).toBeNull();
   });
 });
