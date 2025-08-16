@@ -27,9 +27,14 @@ export default function RepoWizard({ onOpen }: RepoWizardProps) {
   const [remote, setRemote] = useState('');
 
   useEffect(() => {
-    Recent().then((r) => setRecent(r ?? []));
+    Recent().then((r) =>
+      setRecent((r ?? []).map((p) => ({ path: p, lastOpened: '' })))
+    );
   }, []);
 
+  /**
+   * Attempt to open an existing repository, initializing it if needed.
+   */
   const handleExisting = async (p: string) => {
     try {
       await Open(p);
@@ -46,16 +51,18 @@ export default function RepoWizard({ onOpen }: RepoWizardProps) {
     }
   };
 
+  /** Create a new repository at the chosen path and open it. */
   const handleCreate = async () => {
     if (parentDir && repoName) {
       const full = `${parentDir}/${repoName}`;
       await Create(remote, full);
       const latest = await Recent();
-      setRecent(latest ?? []);
+      setRecent((latest ?? []).map((p) => ({ path: p, lastOpened: '' })));
       onOpen(full);
     }
   };
 
+  /** Open a repository from the recent list. */
   const openRecent = async (p: string) => {
     try {
       await Open(p);
