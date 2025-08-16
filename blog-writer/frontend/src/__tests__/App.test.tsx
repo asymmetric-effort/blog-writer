@@ -58,10 +58,14 @@ describe('App', () => {
     expect(screen.getByText('Open or create a blog content repository.')).toBeInTheDocument();
   });
 
-  it('renders a centered modal title', () => {
+  it('renders a centered modal logo', () => {
     render(<App />);
-    const title = screen.getByText('Open/Create Blog Content Repository');
-    expect(title).toBeInTheDocument();
-    expect(title).toHaveStyle({ textAlign: 'center' });
+    const overlay = screen.getByTestId('modal-overlay');
+    expect(overlay).toHaveStyle({
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
+    });
+    expect(screen.getByAltText('logo')).toBeInTheDocument();
   });
 });
