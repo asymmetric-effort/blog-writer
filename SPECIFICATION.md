@@ -29,6 +29,8 @@ On startup the app presents a wizard with three choices:
 * Actions: `git init` → `git remote add origin <ssh-url>` → optional `git fetch` → create `blog/` and `.blog-writer/` →
   initial commit → optional `git push -u origin <branch>`.
 
+Once a repository is opened or created, the application navigates to the editor view where users can author content using a React-based WYSIWYG editor.
+
 ---
 
 ## 2. Architecture (Go + Wails)
@@ -46,7 +48,7 @@ On startup the app presents a wizard with three choices:
 
 **Frontend (React + TypeScript)**
 
-* WYSIWYG editor, metadata form, JSON preview, Git panel, diagnostics.
+* WYSIWYG editor powered by **React Quill**, metadata form, JSON preview, Git panel, diagnostics.
 * LaTeX preview (e.g., KaTeX) — preview only; persisted payload is TeX string.
 
 **Bindings**
