@@ -11,16 +11,34 @@ import React from 'react';
 interface ModalProps {
   /** True if the modal should be displayed. */
   open: boolean;
+  /** Title text shown in the modal title bar. */
+  title: string;
   /** Content to display within the modal. */
   children: React.ReactNode;
 }
 
-export default function Modal({ open, children }: ModalProps): JSX.Element | null {
+export default function Modal({ open, title, children }: ModalProps): JSX.Element | null {
   if (!open) return null;
   return (
-    <dialog open style={dialogStyle}>
-      {children}
-    </dialog>
+    <div
+      className="modal-overlay"
+      data-testid="modal-overlay"
+      style={dialogStyle}
+    >
+      <dialog open style={{ borderRadius: '5px', padding: 0 }}>
+        <div
+          style={{
+            textAlign: 'center',
+            fontFamily: 'system-ui, sans-serif',
+            padding: '0.5rem',
+            borderBottom: '1px solid black',
+          }}
+        >
+          {title}
+        </div>
+        {children}
+      </dialog>
+    </div>
   );
 }
 

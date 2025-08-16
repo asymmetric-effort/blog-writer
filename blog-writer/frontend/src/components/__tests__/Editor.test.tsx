@@ -15,4 +15,10 @@ describe('Editor', () => {
     const textbox = screen.getByRole('textbox');
     expect(textbox).toBeInTheDocument();
   });
+
+  it('stretches to full height', () => {
+    render(<Editor />);
+    const wrapper = document.querySelector('.ql-container')?.parentElement as HTMLElement;
+    expect(wrapper).toHaveStyle({ height: '100%' });
+  });
 });

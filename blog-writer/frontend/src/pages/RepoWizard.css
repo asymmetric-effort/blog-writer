@@ -1,18 +1,21 @@
 /* Copyright (c) 2025 blog-writer authors */
+.repo-wizard {
+  width: 400px;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+}
 .tabs {
   display: flex;
 }
-.tabs button {
+.tabs button.hovered {
+  filter: brightness(0.9);
+}
+.open-tab,
+.create-tab {
   flex: 1;
-  padding: 0.5rem;
-  border: none;
-  cursor: pointer;
-}
-.tabs .inactive {
-  background-color: #ccc;
-}
-.tabs .active {
-  background-color: #eee;
+  display: flex;
+  flex-direction: column;
 }
 .open-tab table {
   width: 100%;
@@ -22,4 +25,12 @@
 .open-tab td {
   border: 1px solid #888;
   padding: 0.25rem;
+}
+.create-tab button {
+  align-self: flex-end;
+  margin-top: 0.5rem;
+}
+.hint {
+  font-size: 0.8rem;
+  text-align: left;
 }
