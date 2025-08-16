@@ -3,6 +3,7 @@
 
 import React from 'react';
 import './StatusBar.css';
+import { normalizePath } from '../utils/normalizePath';
 
 /**
  * StatusBar displays the current repository and file being edited.
@@ -17,10 +18,12 @@ interface StatusBarProps {
 }
 
 export default function StatusBar({ repo, file, wizardOpen }: StatusBarProps): JSX.Element {
+  const repoPath = repo ? normalizePath(repo) : '';
+  const filePath = file ? normalizePath(file) : '';
   const text = wizardOpen
     ? 'Open or create a blog content repository.'
     : repo
-    ? `${repo} - ${file}`
+    ? `${repoPath} - ${filePath}`
     : '';
   return <div className="status-bar">{text}</div>;
 }
