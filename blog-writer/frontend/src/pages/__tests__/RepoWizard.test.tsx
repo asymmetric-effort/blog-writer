@@ -100,6 +100,13 @@ describe('RepoWizard', () => {
       expect(cells[1].textContent).toBe('\u00A0');
     }
   });
+  it('handles undefined recent repositories', async () => {
+    const svc = (window as any).go.services.RepoService;
+    svc.Recent.mockResolvedValue(undefined);
+    render(<RepoWizard onOpen={vi.fn()} />);
+    const rows = await screen.findAllByTestId('recent-row');
+    expect(rows).toHaveLength(5);
+  });
   it('uses Grid component with styled borders for recent repositories', async () => {
     render(<RepoWizard onOpen={vi.fn()} />);
     const grid = await screen.findByTestId('recent-grid');
