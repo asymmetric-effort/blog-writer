@@ -6,6 +6,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import RepoWizard from '../RepoWizard';
 
+vi.mock('../../components/DirectoryPicker', () => ({
+  default: ({ onChange, ...props }: any) => (
+    <button {...props} onClick={() => onChange('C\\Users\\Bob\\repo')}>Browse…</button>
+  ),
+}));
+
 /**
  * RepoWizard interaction tests.
  */
@@ -27,12 +33,9 @@ describe('RepoWizard', () => {
 
   it('opens repository when selected via directory picker on Windows paths', async () => {
     const onOpen = vi.fn();
-    const { container } = render(<RepoWizard onOpen={onOpen} />);
-    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
-    const file = new File(['content'], 'C:\\Users\\Bob\\repo\\a.txt');
-    Object.defineProperty(file, 'path', { value: 'C:\\Users\\Bob\\repo\\a.txt' });
-    fireEvent.change(input, { target: { files: [file] } });
-    await waitFor(() => expect(onOpen).toHaveBeenCalledWith('C:\\Users\\Bob\\repo'));
+    render(<RepoWizard onOpen={onOpen} />);
+    fireEvent.click(screen.getByTestId('directory-picker'));
+    await waitFor(() => expect(onOpen).toHaveBeenCalledWith('C\\Users\\Bob\\repo'));
   });
 
   it('switches to Create tab', () => {

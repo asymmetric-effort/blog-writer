@@ -23,6 +23,7 @@ func main() {
 		return
 	}
 	treeSvc := services.NewTreeService()
+	dirSvc := services.NewDirectoryService()
 
 	// Create application menu.
 	appMenu := newAppMenu(app)
@@ -42,6 +43,7 @@ func main() {
 			app,
 			repoSvc,
 			treeSvc,
+			dirSvc,
 		},
 	})
 
