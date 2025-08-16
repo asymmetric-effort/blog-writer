@@ -16,9 +16,9 @@ describe('MenuBar', () => {
     });
   });
 
-  it('shows help menu items when Help is clicked', async () => {
+  it('shows help menu items when Help icon is clicked', async () => {
     render(<MenuBar />);
-    await userEvent.click(screen.getByText('Help'));
+    await userEvent.click(screen.getByRole('button', { name: 'Help' }));
     expect(screen.getByRole('menuitem', { name: 'About...' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Read the docs' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Report a bug' })).toBeInTheDocument();
@@ -26,22 +26,29 @@ describe('MenuBar', () => {
 
   it('opens Bug Reporting dialog', async () => {
     render(<MenuBar />);
-    await userEvent.click(screen.getByText('Help'));
+    await userEvent.click(screen.getByRole('button', { name: 'Help' }));
     await userEvent.click(screen.getByRole('menuitem', { name: 'Report a bug' }));
     expect(screen.getByText('Bug Reporting')).toBeInTheDocument();
   });
 
   it('opens Documentation dialog', async () => {
     render(<MenuBar />);
-    await userEvent.click(screen.getByText('Help'));
+    await userEvent.click(screen.getByRole('button', { name: 'Help' }));
     await userEvent.click(screen.getByRole('menuitem', { name: 'Read the docs' }));
     expect(screen.getByText('Blog Writer docs')).toBeInTheDocument();
   });
 
   it('opens About dialog', async () => {
     render(<MenuBar />);
-    await userEvent.click(screen.getByText('Help'));
+    await userEvent.click(screen.getByRole('button', { name: 'Help' }));
     await userEvent.click(screen.getByRole('menuitem', { name: 'About...' }));
     expect(screen.getByText('About Blog Writer')).toBeInTheDocument();
+  });
+
+  it('renders the Help button as an icon', () => {
+    render(<MenuBar />);
+    const helpButton = screen.getByRole('button', { name: 'Help' });
+    expect(helpButton).not.toHaveTextContent('Help');
+    expect(screen.getByTestId('help-icon')).toBeInTheDocument();
   });
 });
